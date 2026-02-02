@@ -1,0 +1,144 @@
+ <app-navbar></app-navbar>
+    <div class="container py-4">
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+      </div>
+
+      <div *ngIf="!loading && draw">
+        <div class="row g-4 mb-4">
+          <div class="col-md-8">
+            <div class="card shadow">
+              <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">Lucky Draw #{{ draw.drawId }}</h4>
+              </div>
+              <div class="card-body">
+                <div class="row text-center mb-4">
+                  <div class="col-md-4">
+                    <h2 class="text-warning mb-0">{{ draw.prizePool | number:'1.0-0' }}</h2>
+                    <small class="text-muted">USDT Prize Pool</small>
+                  </div>
+                  <div class="col-md-4">
+                    <h2 class="text-info mb-0">{{ draw.soldTickets }}/{{ draw.totalTickets }}</h2>
+                    <small class="text-muted">Tickets Sold</small>
+                  </div>
+                  <div class="col-md-4">
+                    <h2 class="text-success mb-0">{{ draw.remainingTickets }}</h2>
+                    <small class="text-muted">Remaining</small>
+                  </div>
+                </div>
+
+                <div class="progress mb-4" style="height: 25px;">
+                  <div class="progress-bar bg-warning" [style.width.%]="(draw.soldTickets / draw.totalTickets) * 100">
+                    {{ ((draw.soldTickets / draw.totalTickets) * 100) | number:'1.1-1' }}%
+                  </div>
+                </div>
+
+                <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+                <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+                <form [formGroup]="ticketForm" (ngSubmit)="buyTicket()" *ngIf="draw.status === 'ACTIVE'">
+                  <div class="row align-items-end">
+                    <div class="col-md-6">
+                      <label class="form-label">Number of Tickets ({{ draw.ticketPrice }} USDT each)</label>
+                      <input type="number" class="form-control" formControlName="quantity" min="1" max="100">
+                    </div>
+                    <div class="col-md-3">
+                      <div class="fw-bold">Total: {{ ticketForm.value.quantity * draw.ticketPrice | number:'1.2-2' }} USDT</div>
+                    </div>
+                    <div class="col-md-3">
+                      <button type="submit" class="btn btn-warning w-100" [disabled]="buying || ticketForm.invalid">
+                        <span *ngIf="buying" class="spinner-border spinner-border-sm me-2"></span>
+                        Buy Tickets
+                      </button>
+                    </div>
+                  </div>
+                </form>
+
+                <div *ngIf="draw.status === 'COMPLETED'" class="alert alert-info text-center">
+                  This draw has been completed. Check winners below!
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card shadow h-100">
+              <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Prize Structure</h5>
+              </div>
+              <div class="card-body small">
+                <table class="table table-sm">
+                  <tr><td>1st Prize</td><td class="text-end fw-bold">10,000 USDT</td></tr>
+                  <tr><td>2nd Prize</td><td class="text-end fw-bold">5,000 USDT</td></tr>
+                  <tr><td>3rd Prize</td><td class="text-end fw-bold">4,000 USDT</td></tr>
+                  <tr><td>4th - 10th</td><td class="text-end">1,000 USDT each</td></tr>
+                  <tr><td>11th - 50th</td><td class="text-end">300 USDT each</td></tr>
+                  <tr><td>51st - 100th</td><td class="text-end">120 USDT each</td></tr>
+                  <tr><td>101st - 500th</td><td class="text-end">40 USDT each</td></tr>
+                  <tr><td>501st - 1000th</td><td class="text-end">20 USDT each</td></tr>
+                </table>
+                <div class="text-center mt-2">
+                  <span class="badge bg-success">1,000 Winners / 10,000 Tickets</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card shadow">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">My Tickets ({{ draw.myTickets.length }})</h5>
+              </div>
+              <div class="card-body">
+                <div *ngIf="draw.myTickets.length === 0" class="text-center text-muted py-3">
+                  No tickets purchased yet
+                </div>
+                <div class="d-flex flex-wrap gap-2" *ngIf="draw.myTickets.length > 0">
+                  <span *ngFor="let ticket of draw.myTickets"
+                        class="badge fs-6"
+                        [class]="ticket.isWinner ? 'bg-success' : 'bg-secondary'">
+                    #{{ ticket.ticketNumber }}
+                    <span *ngIf="ticket.isWinner"> - Won {{ ticket.prizeAmount | number:'1.0-0' }} USDT</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card shadow">
+              <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Winners</h5>
+              </div>
+              <div class="card-body">
+                <div *ngIf="draw.winners.length === 0" class="text-center text-muted py-3">
+                  Draw not completed yet
+                </div>
+                <div class="table-responsive" *ngIf="draw.winners.length > 0">
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th>Rank</th>
+                        <th>Winner</th>
+                        <th>Ticket</th>
+                        <th>Prize</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let winner of draw.winners.slice(0, 20)">
+                        <td>#{{ winner.rank }}</td>
+                        <td>{{ winner.username }}</td>
+                        <td>{{ winner.ticketNumber }}</td>
+                        <td class="text-success">{{ winner.prize | number:'1.0-0' }} USDT</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
