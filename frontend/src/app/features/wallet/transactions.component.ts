@@ -8,7 +8,7 @@ import { Transaction } from '../../models/wallet.model';
   selector: 'app-transactions',
   standalone: true,
   imports: [CommonModule, NavbarComponent],
-  template: './transactions.component.html'
+  templateUrl: './transactions.component.html'
 })
 export class TransactionsComponent implements OnInit {
   transactions: Transaction[] = [];
