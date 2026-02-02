@@ -8,7 +8,7 @@ import { IncomeOverview } from '../../models/income.model';
   selector: 'app-income',
   standalone: true,
   imports: [CommonModule, NavbarComponent],
-  template: './income.component.html'
+  templateUrl: './income.component.html'
 })
 export class IncomeComponent implements OnInit {
   income: IncomeOverview | null = null;
