@@ -8,7 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-register',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  template: './register.component.html'
+  templateUrl: './register.component.html'
 })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
