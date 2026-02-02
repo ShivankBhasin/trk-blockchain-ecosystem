@@ -1,0 +1,46 @@
+<app-navbar></app-navbar>
+    <div class="container py-4">
+      <div class="card shadow">
+        <div class="card-header bg-secondary text-white">
+          <h4 class="mb-0">Transaction History</h4>
+        </div>
+        <div class="card-body">
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+          </div>
+
+          <div *ngIf="!loading && transactions.length === 0" class="text-center py-5 text-muted">
+            No transactions yet
+          </div>
+
+          <div class="table-responsive" *ngIf="!loading && transactions.length > 0">
+            <table class="table table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Wallet</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let tx of transactions">
+                  <td>{{ tx.timestamp | date:'short' }}</td>
+                  <td>
+                    <span class="badge" [class]="getTypeBadgeClass(tx.type)">
+                      {{ tx.type | titlecase }}
+                    </span>
+                  </td>
+                  <td>{{ tx.walletType }}</td>
+                  <td [class]="isPositive(tx.type) ? 'text-success' : 'text-danger'">
+                    {{ isPositive(tx.type) ? '+' : '-' }}{{ tx.amount | number:'1.2-2' }} USDT
+                  </td>
+                  <td>{{ tx.description }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
