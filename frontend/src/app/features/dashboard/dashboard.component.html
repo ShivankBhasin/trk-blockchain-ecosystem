@@ -1,0 +1,161 @@
+<app-navbar></app-navbar>
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-md-3">
+          <app-sidebar [wallet]="dashboard?.wallet ?? null"></app-sidebar>
+        </div>
+        <div class="col-md-9">
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+          </div>
+          <div *ngIf="!loading && dashboard">
+            <div *ngIf="dashboard.isPracticeExpiring" class="alert alert-warning">
+              <strong>Warning!</strong> Your practice account will expire in {{ dashboard.daysUntilExpiry }} days.
+              <a routerLink="/wallet/deposit">Deposit 10+ USDT</a> to activate your account.
+            </div>
+
+            <h4 class="mb-4">Welcome, {{ dashboard.user.username }}!</h4>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-3">
+                <div class="card bg-primary text-white h-100">
+                  <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Total Balance</h6>
+                    <h3 class="card-title mb-0">{{ dashboard.wallet.totalBalance | number:'1.2-2' }}</h3>
+                    <small>USDT</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card bg-success text-white h-100">
+                  <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Total Income</h6>
+                    <h3 class="card-title mb-0">{{ dashboard.totalIncome | number:'1.2-2' }}</h3>
+                    <small>USDT</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card bg-info text-white h-100">
+                  <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Games Won</h6>
+                    <h3 class="card-title mb-0">{{ dashboard.gamesWon }}</h3>
+                    <small>Win Rate: {{ dashboard.winRate | number:'1.1-1' }}%</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card bg-warning text-dark h-100">
+                  <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Team Size</h6>
+                    <h3 class="card-title mb-0">{{ dashboard.totalTeamSize }}</h3>
+                    <small>Direct: {{ dashboard.directReferrals }}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <h6 class="mb-0">Account Status</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Account Status:</span>
+                      <span class="badge" [class]="dashboard.user.activated ? 'bg-success' : 'bg-warning'">
+                        {{ dashboard.user.activated ? 'Activated' : 'Pending' }}
+                      </span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Total Deposits:</span>
+                      <span>{{ dashboard.user.totalDeposits | number:'1.2-2' }} USDT</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Total Winnings:</span>
+                      <span class="text-success">{{ dashboard.user.totalWinnings | number:'1.2-2' }} USDT</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Games Played:</span>
+                      <span>{{ dashboard.totalGamesPlayed }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <span>Referral Code:</span>
+                      <span class="badge bg-primary">{{ dashboard.user.referralCode }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <h6 class="mb-0">Cashback Protection</h6>
+                  </div>
+                  <div class="card-body" *ngIf="dashboard.cashback">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Status:</span>
+                      <span class="badge" [class]="dashboard.cashback.active ? 'bg-success' : 'bg-secondary'">
+                        {{ dashboard.cashback.active ? 'Active' : 'Inactive' }}
+                      </span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Total Losses:</span>
+                      <span>{{ dashboard.cashback.totalLosses | number:'1.2-2' }} USDT</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Daily Rate:</span>
+                      <span>{{ dashboard.cashback.dailyRate * 100 | number:'1.2-2' }}%</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Received:</span>
+                      <span class="text-success">{{ dashboard.cashback.totalReceived | number:'1.2-2' }} USDT</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <span>Remaining:</span>
+                      <span>{{ dashboard.cashback.remaining | number:'1.2-2' }} USDT</span>
+                    </div>
+                    <div class="progress mt-3" style="height: 10px;">
+                      <div class="progress-bar bg-success" [style.width.%]="getProgressPercent()"></div>
+                    </div>
+                  </div>
+                  <div class="card-body" *ngIf="!dashboard.cashback">
+                    <p class="text-muted mb-0">Cashback activates when losses reach 100 USDT</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title text-primary">Play Practice Game</h5>
+                    <p class="card-text">Risk-free gameplay with your practice balance</p>
+                    <a routerLink="/games/practice" class="btn btn-outline-primary">Play Now</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title text-success">Play Cash Game</h5>
+                    <p class="card-text">Win 8X your bet with real USDT</p>
+                    <a routerLink="/games/cash" class="btn btn-outline-success">Play Now</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title text-warning">Lucky Draw</h5>
+                    <p class="card-text">Win up to 10,000 USDT with 10 USDT ticket</p>
+                    <a routerLink="/lucky-draw" class="btn btn-outline-warning">Buy Ticket</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
