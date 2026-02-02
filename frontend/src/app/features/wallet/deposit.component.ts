@@ -9,7 +9,7 @@ import { Wallet } from '../../models/wallet.model';
   selector: 'app-deposit',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
-  template: './deposit.component.html'
+  templateUrl: './deposit.component.html'
 })
 export class DepositComponent implements OnInit {
   depositForm: FormGroup;
