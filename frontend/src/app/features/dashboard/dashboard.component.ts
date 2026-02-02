@@ -10,7 +10,7 @@ import { Dashboard } from '../../models/dashboard.model';
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, RouterModule, NavbarComponent, SidebarComponent],
-  template: './dashboard.component.html'
+  templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit {
   dashboard: Dashboard | null = null;
