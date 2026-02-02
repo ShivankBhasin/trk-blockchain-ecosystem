@@ -11,7 +11,7 @@ import { Wallet } from '../../models/wallet.model';
   selector: 'app-cash-game',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
-  template: './cash-game.component.html'
+  templateUrl: './cash-game.component.html'
 })
 export class CashGameComponent implements OnInit {
   gameForm: FormGroup;
