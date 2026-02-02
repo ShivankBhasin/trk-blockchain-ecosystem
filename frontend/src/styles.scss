@@ -1,0 +1,25 @@
+@import 'bootstrap/scss/bootstrap';
+
+body {
+  background-color: #f8f9fa;
+}
+
+.card {
+  border-radius: 10px;
+}
+
+.btn {
+  border-radius: 8px;
+}
+
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table th {
+  font-weight: 600;
+}
+
+.badge {
+  font-weight: 500;
+}

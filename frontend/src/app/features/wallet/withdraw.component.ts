@@ -1,0 +1,138 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NavbarComponent } from '../../layout/navbar.component';
+import { WalletService } from '../../core/services/wallet.service';
+import { Wallet } from '../../models/wallet.model';
+
+@Component({
+  selector: 'app-withdraw',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
+  template: `
+    <app-navbar></app-navbar>
+    <div class="container py-4">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+              <h4 class="mb-0">Withdraw USDT</h4>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-warning">
+                <strong>Limits:</strong> Min 5 USDT, Max 5,000 USDT/day<br>
+                <strong>Fee:</strong> 10% sustainability fee<br>
+                <strong>Network:</strong> BEP20 (BSC) only
+              </div>
+
+              <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+              <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+              <div class="text-center mb-4" *ngIf="wallet">
+                <h5>Direct Wallet: <span class="text-warning">{{ wallet.directWallet | number:'1.2-2' }} USDT</span></h5>
+                <small class="text-muted">Only Direct Wallet balance is withdrawable</small>
+              </div>
+
+              <form [formGroup]="withdrawForm" (ngSubmit)="onSubmit()">
+                <div class="mb-3">
+                  <label class="form-label">Amount (USDT)</label>
+                  <input type="number" class="form-control form-control-lg" formControlName="amount" min="5" max="5000">
+                  <div class="text-danger small" *ngIf="withdrawForm.get('amount')?.touched && withdrawForm.get('amount')?.errors?.['min']">
+                    Minimum withdrawal is 5 USDT
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">BEP20 Wallet Address</label>
+                  <input type="text" class="form-control" formControlName="walletAddress" placeholder="0x...">
+                  <div class="text-danger small" *ngIf="withdrawForm.get('walletAddress')?.touched && withdrawForm.get('walletAddress')?.errors?.['required']">
+                    Wallet address is required
+                  </div>
+                </div>
+
+                <div class="mb-3" *ngIf="withdrawForm.get('amount')?.value">
+                  <div class="card bg-light">
+                    <div class="card-body py-2">
+                      <div class="d-flex justify-content-between">
+                        <span>Amount:</span>
+                        <span>{{ withdrawForm.get('amount')?.value | number:'1.2-2' }} USDT</span>
+                      </div>
+                      <div class="d-flex justify-content-between text-danger">
+                        <span>Fee (10%):</span>
+                        <span>-{{ withdrawForm.get('amount')?.value * 0.1 | number:'1.2-2' }} USDT</span>
+                      </div>
+                      <hr class="my-2">
+                      <div class="d-flex justify-content-between fw-bold">
+                        <span>You receive:</span>
+                        <span>{{ withdrawForm.get('amount')?.value * 0.9 | number:'1.2-2' }} USDT</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-warning btn-lg" [disabled]="loading || withdrawForm.invalid">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    Withdraw
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+})
+export class WithdrawComponent implements OnInit {
+  withdrawForm: FormGroup;
+  wallet: Wallet | null = null;
+  loading = false;
+  success = '';
+  error = '';
+
+  constructor(private fb: FormBuilder, private walletService: WalletService) {
+    this.withdrawForm = this.fb.group({
+      amount: [100, [Validators.required, Validators.min(5), Validators.max(5000)]],
+      walletAddress: ['', Validators.required]
+    });
+  }
+
+  ngOnInit() {
+    this.loadWallet();
+  }
+
+  loadWallet() {
+    this.walletService.getWallet().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.wallet = response.data;
+        }
+      }
+    });
+  }
+
+  onSubmit() {
+    if (this.withdrawForm.invalid) return;
+
+    this.loading = true;
+    this.success = '';
+    this.error = '';
+
+    this.walletService.withdraw(this.withdrawForm.value).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.wallet = response.data;
+          this.success = 'Withdrawal initiated successfully!';
+        } else {
+          this.error = response.message;
+        }
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'Withdrawal failed';
+        this.loading = false;
+      }
+    });
+  }
+}

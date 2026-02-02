@@ -1,0 +1,88 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../core/services/auth.service';
+import { AuthResponse } from '../models/user.model';
+
+@Component({
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" routerLink="/dashboard">
+          TRK Blockchain
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                Games
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" routerLink="/games/practice">Practice Game</a></li>
+                <li><a class="dropdown-item" routerLink="/games/cash">Cash Game</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                Wallet
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" routerLink="/wallet/deposit">Deposit</a></li>
+                <li><a class="dropdown-item" routerLink="/wallet/withdraw">Withdraw</a></li>
+                <li><a class="dropdown-item" routerLink="/wallet/transfer">Transfer</a></li>
+                <li><a class="dropdown-item" routerLink="/wallet/transactions">Transactions</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/referral" routerLinkActive="active">Referral</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/income" routerLinkActive="active">Income</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/lucky-draw" routerLinkActive="active">Lucky Draw</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown" *ngIf="currentUser">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                {{ currentUser.username }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><span class="dropdown-item-text text-muted small">{{ currentUser.email }}</span></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" (click)="logout($event)">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  `
+})
+export class NavbarComponent implements OnInit {
+  currentUser: AuthResponse | null = null;
+
+  constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit() {
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+  }
+
+  logout(event: Event) {
+    event.preventDefault();
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+}
