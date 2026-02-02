@@ -7,7 +7,7 @@ import { Wallet } from '../models/wallet.model';
   selector: 'app-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  template: './sidebar.component.html'
+  templateUrl: './sidebar.component.html'
 })
 export class SidebarComponent {
   @Input() wallet: Wallet | null = null;

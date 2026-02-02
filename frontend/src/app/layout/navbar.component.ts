@@ -8,7 +8,7 @@ import { AuthResponse } from '../models/user.model';
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  template: './navbar.component.html'
+  templateUrl: './navbar.component.html'
 })
 export class NavbarComponent implements OnInit {
   currentUser: AuthResponse | null = null;
