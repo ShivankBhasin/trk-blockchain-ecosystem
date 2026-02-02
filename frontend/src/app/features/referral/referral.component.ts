@@ -8,7 +8,7 @@ import { ReferralInfo } from '../../models/referral.model';
   selector: 'app-referral',
   standalone: true,
   imports: [CommonModule, NavbarComponent],
-  template: './referral.component.html'
+  templateUrl: './referral.component.html'
 })
 export class ReferralComponent implements OnInit {
   referralInfo: ReferralInfo | null = null;
