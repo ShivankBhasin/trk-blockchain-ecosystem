@@ -15,11 +15,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/wallet")
-@RequiredArgsConstructor
 public class WalletController {
 
     private final WalletService walletService;
     private final UserService userService;
+
+    public WalletController(WalletService walletService, UserService userService) {
+        this.walletService = walletService;
+        this.userService = userService;
+    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<WalletDTO>> getWallet(@AuthenticationPrincipal UserDetailsImpl userDetails) {

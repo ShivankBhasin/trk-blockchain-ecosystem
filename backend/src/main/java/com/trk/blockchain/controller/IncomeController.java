@@ -8,6 +8,8 @@ import com.trk.blockchain.security.UserDetailsImpl;
 import com.trk.blockchain.service.IncomeService;
 import com.trk.blockchain.service.UserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +18,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/income")
-@RequiredArgsConstructor
 public class IncomeController {
 
     private final IncomeService incomeService;
     private final UserService userService;
+
+    @Autowired
+    public IncomeController(IncomeService incomeService, UserService userService) {
+        this.incomeService = incomeService;
+        this.userService = userService;
+    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<IncomeDTO>> getIncomeOverview(@AuthenticationPrincipal UserDetailsImpl userDetails) {

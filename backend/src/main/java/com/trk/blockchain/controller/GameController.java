@@ -18,11 +18,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/game")
-@RequiredArgsConstructor
 public class GameController {
 
     private final GameService gameService;
     private final UserService userService;
+
+    public GameController(GameService gameService, UserService userService) {
+        this.gameService = gameService;
+        this.userService = userService;
+    }
 
     @PostMapping("/play")
     public ResponseEntity<ApiResponse<GameResponse>> playGame(

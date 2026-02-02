@@ -71,4 +71,8 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public String getEmail() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

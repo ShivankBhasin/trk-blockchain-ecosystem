@@ -74,4 +74,8 @@ public class User {
 
     @Builder.Default
     private String role = "USER";
+
+    public Long getId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
