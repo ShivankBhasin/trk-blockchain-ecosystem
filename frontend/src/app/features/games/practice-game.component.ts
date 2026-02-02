@@ -11,7 +11,7 @@ import { Wallet } from '../../models/wallet.model';
   selector: 'app-practice-game',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
-  template: './practice-game.component.html'
+  templateUrl: './practice-game.component.html'
 })
 export class PracticeGameComponent implements OnInit {
   gameForm: FormGroup;
