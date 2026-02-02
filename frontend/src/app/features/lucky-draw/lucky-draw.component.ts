@@ -9,7 +9,7 @@ import { LuckyDrawInfo } from '../../models/lucky-draw.model';
   selector: 'app-lucky-draw',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
-  template: './lucky-draw.component.html'
+  templateUrl: './lucky-draw.component.html'
 })
 export class LuckyDrawComponent implements OnInit {
   draw: LuckyDrawInfo | null = null;
