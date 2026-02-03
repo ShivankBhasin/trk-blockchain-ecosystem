@@ -12,15 +12,15 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameResponse {
-    public Long gameId;
-    public String gameType;
-    public BigDecimal betAmount;
-    public String result;
-    public Integer selectedNumber;
-    public Integer winningNumber;
-    public BigDecimal payout;
-    public BigDecimal directPayout;
-    public BigDecimal compoundPayout;
-    public BigDecimal newBalance;
-    public String message;
+    private Long gameId;
+    private String gameType;
+    private BigDecimal betAmount;
+    private String result;
+    private Integer selectedNumber;
+    private Integer winningNumber;
+    private BigDecimal payout;
+    private BigDecimal directPayout;
+    private BigDecimal compoundPayout;
+    private BigDecimal newBalance;
+    private String message;
 }

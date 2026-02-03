@@ -17,14 +17,14 @@ import java.time.LocalDateTime;
 public class Referral {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
 
-    public Long userId;
+    private Long userId;
 
-    public Long referralId;
+    private Long referralId;
 
-    public Integer level;
+    private Integer level;
 
     @Builder.Default
-    public LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

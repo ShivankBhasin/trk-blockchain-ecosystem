@@ -13,21 +13,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-    public Long id;
-    public String email;
-    public String username;
-    public String referralCode;
-    public String referredBy;
-    public BigDecimal practiceBalance;
-    public BigDecimal cashBalance;
-    public BigDecimal directWallet;
-    public BigDecimal luckyDrawWallet;
-    public BigDecimal totalDeposits;
-    public BigDecimal totalLosses;
-    public BigDecimal cashbackReceived;
-    public BigDecimal totalWinnings;
-    public LocalDateTime registrationDate;
-    public Boolean activated;
-    public LocalDateTime activationDate;
-    public Integer directReferrals;
+    private Long id;
+    private String email;
+    private String username;
+    private String referralCode;
+    private String referredBy;
+    private BigDecimal practiceBalance;
+    private BigDecimal cashBalance;
+    private BigDecimal directWallet;
+    private BigDecimal luckyDrawWallet;
+    private BigDecimal totalDeposits;
+    private BigDecimal totalLosses;
+    private BigDecimal cashbackReceived;
+    private BigDecimal totalWinnings;
+    private LocalDateTime registrationDate;
+    private Boolean activated;
+    private LocalDateTime activationDate;
+    private Integer directReferrals;
 }

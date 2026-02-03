@@ -21,14 +21,6 @@ public class CashbackService {
     private final TransactionRepository transactionRepository;
     private final ReferralRepository referralRepository;
 
-    public CashbackService(CashbackRepository cashbackRepository, IncomeRepository incomeRepository, ReferralRepository referralRepository, TransactionRepository transactionRepository, UserRepository userRepository) {
-        this.cashbackRepository = cashbackRepository;
-        this.incomeRepository = incomeRepository;
-        this.referralRepository = referralRepository;
-        this.transactionRepository = transactionRepository;
-        this.userRepository = userRepository;
-    }
-
     @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     public void processDailyCashback() {
@@ -36,50 +28,52 @@ public class CashbackService {
         List<Cashback> activeCashbacks = cashbackRepository.findActiveCashbacksNotCapped();
 
         for (Cashback cashback : activeCashbacks) {
-            if (cashback.lastCreditDate != null && cashback.lastCreditDate.isEqual(today)) {
+            if (cashback.getLastCreditDate() != null && cashback.getLastCreditDate().isEqual(today)) {
                 continue;
             }
 
-            if (cashback.totalReceived.compareTo(cashback.maxCapping) >= 0) {
-                cashback.active = false;
+            if (cashback.getTotalReceived().compareTo(cashback.getMaxCapping()) >= 0) {
+                cashback.setActive(false);
                 cashbackRepository.save(cashback);
                 continue;
             }
 
-            BigDecimal dailyAmount = cashback.totalLosses.multiply(cashback.dailyRate);
-            BigDecimal remainingCap = cashback.maxCapping.subtract(cashback.totalReceived);
+            BigDecimal dailyAmount = cashback.getTotalLosses().multiply(cashback.getDailyRate());
+            BigDecimal remainingCap = cashback.getMaxCapping().subtract(cashback.getTotalReceived());
             BigDecimal actualCredit = dailyAmount.min(remainingCap);
 
             if (actualCredit.compareTo(BigDecimal.ZERO) <= 0) continue;
 
-            User user = userRepository.findById(cashback.userId).orElse(null);
+            User user = userRepository.findById(cashback.getUserId()).orElse(null);
             if (user == null) continue;
 
             BigDecimal luckyDrawCredit = actualCredit.multiply(new BigDecimal("0.20"));
             BigDecimal directCredit = actualCredit.subtract(luckyDrawCredit);
 
-            user.directWallet = user.directWallet.add(directCredit);
-            user.luckyDrawWallet = user.luckyDrawWallet.add(luckyDrawCredit);
-            user.cashbackReceived = user.cashbackReceived.add(actualCredit);
+            user.setDirectWallet(user.getDirectWallet().add(directCredit));
+            user.setLuckyDrawWallet(user.getLuckyDrawWallet().add(luckyDrawCredit));
+            user.setCashbackReceived(user.getCashbackReceived().add(actualCredit));
             userRepository.save(user);
 
-            cashback.totalReceived = cashback.totalReceived.add(actualCredit);
-            cashback.lastCreditDate = today;
+            cashback.setTotalReceived(cashback.getTotalReceived().add(actualCredit));
+            cashback.setLastCreditDate(today);
             cashbackRepository.save(cashback);
 
-            Income income = new Income();
-            income.userId = user.id;
-            income.type = Income.IncomeType.CASHBACK;
-            income.amount = actualCredit;
-            income.description = "Daily cashback (80% direct, 20% lucky draw)";
+            Income income = Income.builder()
+                    .userId(user.getId())
+                    .type(Income.IncomeType.CASHBACK)
+                    .amount(actualCredit)
+                    .description("Daily cashback (80% direct, 20% lucky draw)")
+                    .build();
             incomeRepository.save(income);
 
-            Transaction transaction = new Transaction();
-            transaction.userId = user.id;
-            transaction.type = Transaction.TransactionType.CASHBACK;
-            transaction.amount = actualCredit;
-            transaction.walletType = Transaction.WalletType.DIRECT;
-            transaction.description = "Daily cashback credit";
+            Transaction transaction = Transaction.builder()
+                    .userId(user.getId())
+                    .type(Transaction.TransactionType.CASHBACK)
+                    .amount(actualCredit)
+                    .walletType(Transaction.WalletType.DIRECT)
+                    .description("Daily cashback credit")
+                    .build();
             transactionRepository.save(transaction);
 
             processRoiOnRoi(user, actualCredit);
@@ -87,36 +81,37 @@ public class CashbackService {
     }
 
     private void processRoiOnRoi(User user, BigDecimal cashbackAmount) {
-        if (user.referredBy == null) return;
+        if (user.getReferredBy() == null) return;
 
         BigDecimal distributableAmount = cashbackAmount.multiply(new BigDecimal("0.50"));
 
-        User referrer = userRepository.findByReferralCode(user.referredBy).orElse(null);
+        User referrer = userRepository.findByReferralCode(user.getReferredBy()).orElse(null);
         processRoiOnRoiChain(referrer, user, distributableAmount, 1);
     }
 
     private void processRoiOnRoiChain(User referrer, User source, BigDecimal distributableAmount, int level) {
-        if (level > 15 || referrer == null || !referrer.activated) return;
+        if (level > 15 || referrer == null || !referrer.getActivated()) return;
 
         BigDecimal commissionRate = getRoiOnRoiRate(level);
         BigDecimal commission = distributableAmount.multiply(commissionRate);
 
         if (commission.compareTo(BigDecimal.ZERO) > 0) {
-            referrer.directWallet = referrer.directWallet.add(commission);
+            referrer.setDirectWallet(referrer.getDirectWallet().add(commission));
             userRepository.save(referrer);
 
-            Income income = new Income();
-            income.userId = referrer.id;
-            income.type = Income.IncomeType.ROI_ON_ROI;
-            income.amount = commission;
-            income.sourceUserId = source.id;
-            income.level = level;
-            income.description = "ROI on ROI from " + source.username + " (Level " + level + ")";
+            Income income = Income.builder()
+                    .userId(referrer.getId())
+                    .type(Income.IncomeType.ROI_ON_ROI)
+                    .amount(commission)
+                    .sourceUserId(source.getId())
+                    .level(level)
+                    .description("ROI on ROI from " + source.getUsername() + " (Level " + level + ")")
+                    .build();
             incomeRepository.save(income);
         }
 
-        if (referrer.referredBy != null) {
-            User nextReferrer = userRepository.findByReferralCode(referrer.referredBy).orElse(null);
+        if (referrer.getReferredBy() != null) {
+            User nextReferrer = userRepository.findByReferralCode(referrer.getReferredBy()).orElse(null);
             processRoiOnRoiChain(nextReferrer, source, distributableAmount, level + 1);
         }
     }
@@ -130,18 +125,18 @@ public class CashbackService {
     }
 
     public void updateCashbackTier(User user) {
-        Cashback cashback = cashbackRepository.findByUserId(user.id).orElse(null);
-        if (cashback == null || !cashback.active) return;
+        Cashback cashback = cashbackRepository.findByUserId(user.getId()).orElse(null);
+        if (cashback == null || !cashback.getActive()) return;
 
-        int directRefs = user.directReferrals;
+        int directRefs = user.getDirectReferrals();
         int newMultiplier = 1;
         if (directRefs >= 20) newMultiplier = 8;
         else if (directRefs >= 10) newMultiplier = 4;
         else if (directRefs >= 5) newMultiplier = 2;
 
-        if (newMultiplier > cashback.cappingMultiplier) {
-            cashback.cappingMultiplier = newMultiplier;
-            cashback.maxCapping = cashback.totalLosses.multiply(new BigDecimal(newMultiplier));
+        if (newMultiplier > cashback.getCappingMultiplier()) {
+            cashback.setCappingMultiplier(newMultiplier);
+            cashback.setMaxCapping(cashback.getTotalLosses().multiply(new BigDecimal(newMultiplier)));
             cashbackRepository.save(cashback);
         }
     }

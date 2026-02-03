@@ -18,37 +18,33 @@ import java.time.LocalDateTime;
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
 
-    public Long userId;
-
-    @Enumerated(EnumType.STRING)
-    public GameType gameType;
-
-    public BigDecimal betAmount;
+    private Long userId;
 
     @Enumerated(EnumType.STRING)
-    public GameResult result;
+    private GameType gameType;
+
+    private BigDecimal betAmount;
+
+    @Enumerated(EnumType.STRING)
+    private GameResult result;
 
     @Builder.Default
-    public BigDecimal multiplier = new BigDecimal("8");
+    private BigDecimal multiplier = new BigDecimal("8");
 
-    public BigDecimal payout;
+    private BigDecimal payout;
 
-    public BigDecimal directPayout;
+    private BigDecimal directPayout;
 
-    public BigDecimal compoundPayout;
+    private BigDecimal compoundPayout;
 
     @Builder.Default
-    public LocalDateTime timestamp = LocalDateTime.now();
+    private LocalDateTime timestamp = LocalDateTime.now();
 
-    public Integer selectedNumber;
+    private Integer selectedNumber;
 
-    public Integer winningNumber;
-
-    public void setResult(GameResult gameResult) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    private Integer winningNumber;
 
     public enum GameType {
         PRACTICE, CASH

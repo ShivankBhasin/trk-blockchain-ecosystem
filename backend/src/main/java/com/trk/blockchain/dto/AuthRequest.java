@@ -13,8 +13,8 @@ import javax.validation.constraints.NotBlank;
 public class AuthRequest {
     @NotBlank
     @Email
-    public String email;
+    private String email;
 
     @NotBlank
-    public String password;
+    private String password;
 }

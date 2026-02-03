@@ -14,23 +14,23 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReferralDTO {
-    public String referralCode;
-    public String referralLink;
-    public Integer totalReferrals;
-    public Integer directReferrals;
-    public BigDecimal totalEarnings;
-    public List<ReferralMember> directMembers;
+    private String referralCode;
+    private String referralLink;
+    private Integer totalReferrals;
+    private Integer directReferrals;
+    private BigDecimal totalEarnings;
+    private List<ReferralMember> directMembers;
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReferralMember {
-        public Long id;
-        public String username;
-        public Integer level;
-        public BigDecimal deposits;
-        public LocalDateTime joinedAt;
-        public Boolean activated;
+        private Long id;
+        private String username;
+        private Integer level;
+        private BigDecimal deposits;
+        private LocalDateTime joinedAt;
+        private Boolean activated;
     }
 }

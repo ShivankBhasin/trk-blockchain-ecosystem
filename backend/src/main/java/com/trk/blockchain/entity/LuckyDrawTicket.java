@@ -18,21 +18,21 @@ import java.time.LocalDateTime;
 public class LuckyDrawTicket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
 
-    public Long userId;
+    private Long userId;
 
-    public Long drawId;
+    private Long drawId;
 
-    public Integer ticketNumber;
-
-    @Builder.Default
-    public LocalDateTime purchaseDate = LocalDateTime.now();
+    private Integer ticketNumber;
 
     @Builder.Default
-    public Boolean isWinner = false;
+    private LocalDateTime purchaseDate = LocalDateTime.now();
 
-    public Integer prizeRank;
+    @Builder.Default
+    private Boolean isWinner = false;
 
-    public BigDecimal prizeAmount;
+    private Integer prizeRank;
+
+    private BigDecimal prizeAmount;
 }

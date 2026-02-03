@@ -16,15 +16,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/referral")
+@RequiredArgsConstructor
 public class ReferralController {
 
     private final ReferralService referralService;
     private final UserService userService;
-
-    public ReferralController(ReferralService referralService, UserService userService) {
-        this.referralService = referralService;
-        this.userService = userService;
-    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<ReferralDTO>> getReferralInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {

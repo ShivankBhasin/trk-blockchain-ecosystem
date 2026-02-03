@@ -14,12 +14,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class TransferRequest {
     @NotBlank
-    public String fromWallet;
+    private String fromWallet;
 
     @NotBlank
-    public String toWallet;
+    private String toWallet;
 
     @NotNull
     @Min(1)
-    public BigDecimal amount;
+    private BigDecimal amount;
 }

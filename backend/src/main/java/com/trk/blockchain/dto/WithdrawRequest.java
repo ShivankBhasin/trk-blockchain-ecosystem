@@ -17,8 +17,8 @@ public class WithdrawRequest {
     @NotNull
     @Min(5)
     @Max(5000)
-    public BigDecimal amount;
+    private BigDecimal amount;
 
     @NotBlank
-    public String walletAddress;
+    private String walletAddress;
 }

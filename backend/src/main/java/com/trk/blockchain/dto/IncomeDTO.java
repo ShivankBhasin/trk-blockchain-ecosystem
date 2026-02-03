@@ -13,24 +13,24 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IncomeDTO {
-    public BigDecimal totalIncome;
-    public BigDecimal winnersIncome;
-    public BigDecimal directLevelIncome;
-    public BigDecimal winnerLevelIncome;
-    public BigDecimal cashbackIncome;
-    public BigDecimal roiOnRoiIncome;
-    public BigDecimal clubIncome;
-    public BigDecimal luckyDrawIncome;
-    public List<IncomeHistory> recentIncomes;
+    private BigDecimal totalIncome;
+    private BigDecimal winnersIncome;
+    private BigDecimal directLevelIncome;
+    private BigDecimal winnerLevelIncome;
+    private BigDecimal cashbackIncome;
+    private BigDecimal roiOnRoiIncome;
+    private BigDecimal clubIncome;
+    private BigDecimal luckyDrawIncome;
+    private List<IncomeHistory> recentIncomes;
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class IncomeHistory {
-        public String type;
-        public BigDecimal amount;
-        public String source;
-        public String timestamp;
+        private String type;
+        private BigDecimal amount;
+        private String source;
+        private String timestamp;
     }
 }

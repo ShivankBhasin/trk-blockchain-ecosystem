@@ -14,27 +14,27 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LuckyDrawDTO {
-    public Long drawId;
-    public Integer totalTickets;
-    public Integer soldTickets;
-    public Integer remainingTickets;
-    public String status;
-    public BigDecimal prizePool;
-    public BigDecimal ticketPrice;
-    public LocalDateTime drawDate;
-    public List<TicketInfo> myTickets;
-    public List<WinnerInfo> winners;
+    private Long drawId;
+    private Integer totalTickets;
+    private Integer soldTickets;
+    private Integer remainingTickets;
+    private String status;
+    private BigDecimal prizePool;
+    private BigDecimal ticketPrice;
+    private LocalDateTime drawDate;
+    private List<TicketInfo> myTickets;
+    private List<WinnerInfo> winners;
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TicketInfo {
-        public Long ticketId;
-        public Integer ticketNumber;
-        public LocalDateTime purchaseDate;
-        public Boolean isWinner;
-        public BigDecimal prizeAmount;
+        private Long ticketId;
+        private Integer ticketNumber;
+        private LocalDateTime purchaseDate;
+        private Boolean isWinner;
+        private BigDecimal prizeAmount;
     }
 
     @Data
@@ -42,9 +42,9 @@ public class LuckyDrawDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WinnerInfo {
-        public Integer rank;
-        public String username;
-        public Integer ticketNumber;
-        public BigDecimal prize;
+        private Integer rank;
+        private String username;
+        private Integer ticketNumber;
+        private BigDecimal prize;
     }
 }

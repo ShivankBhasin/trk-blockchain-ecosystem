@@ -18,28 +18,28 @@ import java.time.LocalDateTime;
 public class LuckyDraw {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
 
     @Version
     private Long version;
 
     @Builder.Default
-    public Integer totalTickets = 10000;
+    private Integer totalTickets = 10000;
 
     @Builder.Default
-    public Integer soldTickets = 0;
+    private Integer soldTickets = 0;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    public DrawStatus status = DrawStatus.ACTIVE;
+    private DrawStatus status = DrawStatus.ACTIVE;
 
-    public LocalDateTime drawDate;
-
-    @Builder.Default
-    public BigDecimal prizePool = new BigDecimal("70000");
+    private LocalDateTime drawDate;
 
     @Builder.Default
-    public BigDecimal ticketPrice = new BigDecimal("10");
+    private BigDecimal prizePool = new BigDecimal("70000");
+
+    @Builder.Default
+    private BigDecimal ticketPrice = new BigDecimal("10");
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -16,15 +16,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/lucky-draw")
+@RequiredArgsConstructor
 public class LuckyDrawController {
 
     private final LuckyDrawService luckyDrawService;
     private final UserService userService;
-
-    public LuckyDrawController(LuckyDrawService luckyDrawService, UserService userService) {
-        this.luckyDrawService = luckyDrawService;
-        this.userService = userService;
-    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<LuckyDrawDTO>> getCurrentDraw(@AuthenticationPrincipal UserDetailsImpl userDetails) {
