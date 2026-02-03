@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: trk-blockchain
-    env: java
-    buildCommand: mvn clean install -DskipTests
-    startCommand: java -Dserver.port=$PORT -jar target/blockchain-1.0.0.jar
-    healthCheckPath: /actuator/health
