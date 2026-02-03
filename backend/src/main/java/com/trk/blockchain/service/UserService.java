@@ -19,11 +19,11 @@ import java.time.temporal.ChronoUnit;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final GameRepository gameRepository;
-    private final ReferralRepository referralRepository;
-    private final IncomeRepository incomeRepository;
-    private final CashbackRepository cashbackRepository;
+    private UserRepository userRepository;
+    private GameRepository gameRepository;
+    private ReferralRepository referralRepository;
+    private IncomeRepository incomeRepository;
+    private CashbackRepository cashbackRepository;
 
     public User getCurrentUser(String email) {
         return userRepository.findByEmail(email)
@@ -31,46 +31,46 @@ public class UserService {
     }
 
     public UserDTO getUserDTO(User user) {
-        return UserDTO.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .referralCode(user.getReferralCode())
-                .referredBy(user.getReferredBy())
-                .practiceBalance(user.getPracticeBalance())
-                .cashBalance(user.getCashBalance())
-                .directWallet(user.getDirectWallet())
-                .luckyDrawWallet(user.getLuckyDrawWallet())
-                .totalDeposits(user.getTotalDeposits())
-                .totalLosses(user.getTotalLosses())
-                .cashbackReceived(user.getCashbackReceived())
-                .totalWinnings(user.getTotalWinnings())
-                .registrationDate(user.getRegistrationDate())
-                .activated(user.getActivated())
-                .activationDate(user.getActivationDate())
-                .directReferrals(user.getDirectReferrals())
-                .build();
+        UserDTO userDTO = new UserDTO();
+        userDTO.id = user.id;
+        userDTO.email = user.email;
+        userDTO.username = user.username;
+        userDTO.referralCode = user.referralCode;
+        userDTO.referredBy = user.referredBy;
+        userDTO.practiceBalance = user.practiceBalance;
+        userDTO.cashBalance = user.cashBalance;
+        userDTO.directWallet = user.directWallet;
+        userDTO.luckyDrawWallet = user.luckyDrawWallet;
+        userDTO.totalDeposits = user.totalDeposits;
+        userDTO.totalLosses = user.totalLosses;
+        userDTO.cashbackReceived = user.cashbackReceived;
+        userDTO.totalWinnings = user.totalWinnings;
+        userDTO.registrationDate = user.registrationDate;
+        userDTO.activated = user.activated;
+        userDTO.activationDate = user.activationDate;
+        userDTO.directReferrals = user.directReferrals;
+        return userDTO;
     }
 
     public WalletDTO getWalletDTO(User user) {
-        BigDecimal totalBalance = user.getPracticeBalance()
-                .add(user.getCashBalance())
-                .add(user.getDirectWallet())
-                .add(user.getLuckyDrawWallet());
+        BigDecimal totalBalance = user.practiceBalance
+                .add(user.cashBalance)
+                .add(user.directWallet)
+                .add(user.luckyDrawWallet);
 
-        return WalletDTO.builder()
-                .practiceBalance(user.getPracticeBalance())
-                .cashBalance(user.getCashBalance())
-                .directWallet(user.getDirectWallet())
-                .luckyDrawWallet(user.getLuckyDrawWallet())
-                .totalBalance(totalBalance)
-                .build();
+        WalletDTO walletDTO = new WalletDTO();
+        walletDTO.practiceBalance = user.practiceBalance;
+        walletDTO.cashBalance = user.cashBalance;
+        walletDTO.directWallet = user.directWallet;
+        walletDTO.luckyDrawWallet = user.luckyDrawWallet;
+        walletDTO.totalBalance = totalBalance;
+        return walletDTO;
     }
 
     public DashboardDTO getDashboard(User user) {
-        Integer totalGames = gameRepository.countByUserId(user.getId());
-        Integer gamesWon = gameRepository.countWinsByUserId(user.getId());
-        Integer gamesLost = gameRepository.countLossesByUserId(user.getId());
+        Integer totalGames = gameRepository.countByUserId(user.id);
+        Integer gamesWon = gameRepository.countWinsByUserId(user.id);
+        Integer gamesLost = gameRepository.countLossesByUserId(user.id);
 
         BigDecimal winRate = BigDecimal.ZERO;
         if (totalGames > 0) {
@@ -79,40 +79,42 @@ public class UserService {
                     .multiply(new BigDecimal("100"));
         }
 
-        Integer totalTeamSize = referralRepository.countTotalReferrals(user.getId());
-        BigDecimal totalIncome = incomeRepository.sumTotalIncomeByUserId(user.getId());
+        Integer totalTeamSize = referralRepository.countTotalReferrals(user.id);
+        BigDecimal totalIncome = incomeRepository.sumTotalIncomeByUserId(user.id);
 
-        long daysSinceRegistration = ChronoUnit.DAYS.between(user.getRegistrationDate(), LocalDateTime.now());
+        long daysSinceRegistration = ChronoUnit.DAYS.between(user.registrationDate, LocalDateTime.now());
         int daysUntilExpiry = Math.max(0, 30 - (int) daysSinceRegistration);
-        boolean isPracticeExpiring = !user.getActivated() && daysUntilExpiry <= 7;
+        boolean isPracticeExpiring = !user.activated && daysUntilExpiry <= 7;
 
-        Cashback cashback = cashbackRepository.findByUserId(user.getId()).orElse(null);
+        Cashback cashback = cashbackRepository.findByUserId(user.id).orElse(null);
         DashboardDTO.CashbackInfo cashbackInfo = null;
         if (cashback != null) {
-            BigDecimal remaining = cashback.getMaxCapping().subtract(cashback.getTotalReceived());
-            cashbackInfo = DashboardDTO.CashbackInfo.builder()
-                    .active(cashback.getActive())
-                    .totalLosses(cashback.getTotalLosses())
-                    .dailyRate(cashback.getDailyRate())
-                    .totalReceived(cashback.getTotalReceived())
-                    .maxCapping(cashback.getMaxCapping())
-                    .remaining(remaining.max(BigDecimal.ZERO))
-                    .build();
+            BigDecimal remaining = cashback.maxCapping.subtract(cashback.totalReceived);
+            
+            DashboardDTO.CashbackInfo info = new DashboardDTO.CashbackInfo();
+            info.active = cashback.active;
+            info.totalLosses = cashback.totalLosses;
+            info.dailyRate = cashback.dailyRate;
+            info.totalReceived = cashback.totalReceived;
+            info.maxCapping = cashback.maxCapping;
+            info.remaining = remaining.max(BigDecimal.ZERO);
+            cashbackInfo = info;
         }
 
-        return DashboardDTO.builder()
-                .user(getUserDTO(user))
-                .wallet(getWalletDTO(user))
-                .totalIncome(totalIncome)
-                .totalGamesPlayed(totalGames)
-                .gamesWon(gamesWon)
-                .gamesLost(gamesLost)
-                .winRate(winRate)
-                .directReferrals(user.getDirectReferrals())
-                .totalTeamSize(totalTeamSize != null ? totalTeamSize : 0)
-                .daysUntilExpiry(daysUntilExpiry)
-                .isPracticeExpiring(isPracticeExpiring)
-                .cashback(cashbackInfo)
-                .build();
+        DashboardDTO dashboardDTO = new DashboardDTO();
+        dashboardDTO.user = getUserDTO(user);
+        dashboardDTO.wallet = getWalletDTO(user);
+        dashboardDTO.totalIncome = totalIncome;
+        dashboardDTO.totalGamesPlayed = totalGames;
+        dashboardDTO.gamesWon = gamesWon;
+        dashboardDTO.gamesLost = gamesLost;
+        dashboardDTO.winRate = winRate;
+        dashboardDTO.directReferrals = user.directReferrals;
+        dashboardDTO.totalTeamSize = totalTeamSize != null ? totalTeamSize : 0;
+        dashboardDTO.daysUntilExpiry = daysUntilExpiry;
+        dashboardDTO.isPracticeExpiring = isPracticeExpiring;
+        dashboardDTO.cashback = cashbackInfo;
+        
+        return dashboardDTO;
     }
 }

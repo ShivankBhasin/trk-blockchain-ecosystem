@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LuckyDrawService {
 
-    private final LuckyDrawRepository luckyDrawRepository;
-    private final LuckyDrawTicketRepository ticketRepository;
-    private final UserRepository userRepository;
-    private final TransactionRepository transactionRepository;
-    private final IncomeRepository incomeRepository;
+    private LuckyDrawRepository luckyDrawRepository;
+    private LuckyDrawTicketRepository ticketRepository;
+    private UserRepository userRepository;
+    private TransactionRepository transactionRepository;
+    private IncomeRepository incomeRepository;
 
     private static final BigDecimal TICKET_PRICE = new BigDecimal("10");
     private static final int TOTAL_TICKETS = 10000;
@@ -30,47 +30,50 @@ public class LuckyDrawService {
 
     public LuckyDrawDTO getCurrentDraw(User user) {
         LuckyDraw draw = getOrCreateActiveDraw();
-        List<LuckyDrawTicket> userTickets = ticketRepository.findByUserIdAndDrawId(user.getId(), draw.getId());
+        List<LuckyDrawTicket> userTickets = ticketRepository.findByUserIdAndDrawId(user.id, draw.id);
 
         List<LuckyDrawDTO.TicketInfo> ticketInfos = userTickets.stream()
-                .map(t -> LuckyDrawDTO.TicketInfo.builder()
-                        .ticketId(t.getId())
-                        .ticketNumber(t.getTicketNumber())
-                        .purchaseDate(t.getPurchaseDate())
-                        .isWinner(t.getIsWinner())
-                        .prizeAmount(t.getPrizeAmount())
-                        .build())
+                .map(t -> {
+                    LuckyDrawDTO.TicketInfo ticketInfo = new LuckyDrawDTO.TicketInfo();
+                    ticketInfo.ticketId = t.id;
+                    ticketInfo.ticketNumber = t.ticketNumber;
+                    ticketInfo.purchaseDate = t.purchaseDate;
+                    ticketInfo.isWinner = t.isWinner;
+                    ticketInfo.prizeAmount = t.prizeAmount;
+                    return ticketInfo;
+                })
                 .collect(Collectors.toList());
 
         List<LuckyDrawDTO.WinnerInfo> winners = new ArrayList<>();
-        if (draw.getStatus() == LuckyDraw.DrawStatus.COMPLETED) {
-            List<LuckyDrawTicket> winningTickets = ticketRepository.findByDrawIdAndIsWinnerTrue(draw.getId());
+        if (draw.status == LuckyDraw.DrawStatus.COMPLETED) {
+            List<LuckyDrawTicket> winningTickets = ticketRepository.findByDrawIdAndIsWinnerTrue(draw.id);
             winners = winningTickets.stream()
                     .map(t -> {
-                        User winner = userRepository.findById(t.getUserId()).orElse(null);
-                        return LuckyDrawDTO.WinnerInfo.builder()
-                                .rank(t.getPrizeRank())
-                                .username(winner != null ? winner.getUsername() : "Unknown")
-                                .ticketNumber(t.getTicketNumber())
-                                .prize(t.getPrizeAmount())
-                                .build();
+                        User winner = userRepository.findById(t.userId).orElse(null);
+                        LuckyDrawDTO.WinnerInfo winnerInfo = new LuckyDrawDTO.WinnerInfo();
+                        winnerInfo.rank = t.prizeRank;
+                        winnerInfo.username = winner != null ? winner.username : "Unknown";
+                        winnerInfo.ticketNumber = t.ticketNumber;
+                        winnerInfo.prize = t.prizeAmount;
+                        return winnerInfo;
                     })
-                    .sorted(Comparator.comparing(LuckyDrawDTO.WinnerInfo::getRank))
+                    .sorted(Comparator.comparing(w -> w.rank))
                     .collect(Collectors.toList());
         }
 
-        return LuckyDrawDTO.builder()
-                .drawId(draw.getId())
-                .totalTickets(draw.getTotalTickets())
-                .soldTickets(draw.getSoldTickets())
-                .remainingTickets(draw.getTotalTickets() - draw.getSoldTickets())
-                .status(draw.getStatus().name())
-                .prizePool(draw.getPrizePool())
-                .ticketPrice(draw.getTicketPrice())
-                .drawDate(draw.getDrawDate())
-                .myTickets(ticketInfos)
-                .winners(winners)
-                .build();
+        LuckyDrawDTO luckyDrawDTO = new LuckyDrawDTO();
+        luckyDrawDTO.drawId = draw.id;
+        luckyDrawDTO.totalTickets = draw.totalTickets;
+        luckyDrawDTO.soldTickets = draw.soldTickets;
+        luckyDrawDTO.remainingTickets = draw.totalTickets - draw.soldTickets;
+        luckyDrawDTO.status = draw.status.name();
+        luckyDrawDTO.prizePool = draw.prizePool;
+        luckyDrawDTO.ticketPrice = draw.ticketPrice;
+        luckyDrawDTO.drawDate = draw.drawDate;
+        luckyDrawDTO.myTickets = ticketInfos;
+        luckyDrawDTO.winners = winners;
+
+        return luckyDrawDTO;
     }
 
     @Transactional
@@ -81,10 +84,10 @@ public class LuckyDrawService {
 
         BigDecimal totalCost = TICKET_PRICE.multiply(new BigDecimal(quantity));
 
-        User freshUser = userRepository.findById(user.getId())
+        User freshUser = userRepository.findById(user.id)
                 .orElseThrow(() -> new BadRequestException("User not found"));
 
-        BigDecimal availableBalance = freshUser.getLuckyDrawWallet().add(freshUser.getDirectWallet());
+        BigDecimal availableBalance = freshUser.luckyDrawWallet.add(freshUser.directWallet);
         if (availableBalance.compareTo(totalCost) < 0) {
             throw new InsufficientBalanceException("Insufficient balance. Need " + totalCost + " USDT");
         }
@@ -92,51 +95,49 @@ public class LuckyDrawService {
         LuckyDraw draw = luckyDrawRepository.findFirstByStatusWithLock(LuckyDraw.DrawStatus.ACTIVE)
                 .orElseGet(this::createNewDraw);
 
-        int remaining_tickets = draw.getTotalTickets() - draw.getSoldTickets();
+        int remaining_tickets = draw.totalTickets - draw.soldTickets;
         if (remaining_tickets < quantity) {
             throw new BadRequestException("Not enough tickets available. Only " + remaining_tickets + " remaining");
         }
 
         BigDecimal remaining = totalCost;
-        if (freshUser.getLuckyDrawWallet().compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal fromLuckyDraw = freshUser.getLuckyDrawWallet().min(remaining);
-            freshUser.setLuckyDrawWallet(freshUser.getLuckyDrawWallet().subtract(fromLuckyDraw));
+        if (freshUser.luckyDrawWallet.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal fromLuckyDraw = freshUser.luckyDrawWallet.min(remaining);
+            freshUser.luckyDrawWallet = freshUser.luckyDrawWallet.subtract(fromLuckyDraw);
             remaining = remaining.subtract(fromLuckyDraw);
         }
         if (remaining.compareTo(BigDecimal.ZERO) > 0) {
-            freshUser.setDirectWallet(freshUser.getDirectWallet().subtract(remaining));
+            freshUser.directWallet = freshUser.directWallet.subtract(remaining);
         }
 
-        draw.setSoldTickets(draw.getSoldTickets() + quantity);
+        draw.soldTickets = draw.soldTickets + quantity;
         luckyDrawRepository.save(draw);
 
-        Integer lastTicketNumber = ticketRepository.findMaxTicketNumberByDrawId(draw.getId());
+        Integer lastTicketNumber = ticketRepository.findMaxTicketNumberByDrawId(draw.id);
         int nextTicketNumber = (lastTicketNumber != null ? lastTicketNumber : 0) + 1;
 
         for (int i = 0; i < quantity; i++) {
-            LuckyDrawTicket ticket = LuckyDrawTicket.builder()
-                    .userId(freshUser.getId())
-                    .drawId(draw.getId())
-                    .ticketNumber(nextTicketNumber + i)
-                    .build();
+            LuckyDrawTicket ticket = new LuckyDrawTicket();
+            ticket.userId = freshUser.id;
+            ticket.drawId = draw.id;
+            ticket.ticketNumber = nextTicketNumber + i;
             ticketRepository.save(ticket);
         }
 
         userRepository.save(freshUser);
 
-        Transaction transaction = Transaction.builder()
-                .userId(freshUser.getId())
-                .type(Transaction.TransactionType.LUCKY_DRAW_ENTRY)
-                .amount(totalCost)
-                .walletType(Transaction.WalletType.LUCKY_DRAW)
-                .description("Purchased " + quantity + " lucky draw ticket(s)")
-                .build();
+        Transaction transaction = new Transaction();
+        transaction.userId = freshUser.id;
+        transaction.type = Transaction.TransactionType.LUCKY_DRAW_ENTRY;
+        transaction.amount = totalCost;
+        transaction.walletType = Transaction.WalletType.LUCKY_DRAW;
+        transaction.description = "Purchased " + quantity + " lucky draw ticket(s)";
         transactionRepository.save(transaction);
 
-        boolean shouldExecuteDraw = draw.getSoldTickets() >= draw.getTotalTickets()
-                && draw.getStatus() == LuckyDraw.DrawStatus.ACTIVE;
+        boolean shouldExecuteDraw = draw.soldTickets >= draw.totalTickets
+                && draw.status == LuckyDraw.DrawStatus.ACTIVE;
         if (shouldExecuteDraw) {
-            draw.setStatus(LuckyDraw.DrawStatus.PENDING);
+            draw.status = LuckyDraw.DrawStatus.PENDING;
             luckyDrawRepository.save(draw);
             executeDraw(draw);
         }
@@ -152,68 +153,64 @@ public class LuckyDrawService {
     private synchronized LuckyDraw createNewDraw() {
         return luckyDrawRepository.findFirstByStatusOrderByCreatedAtDesc(LuckyDraw.DrawStatus.ACTIVE)
                 .orElseGet(() -> {
-                    LuckyDraw newDraw = LuckyDraw.builder()
-                            .totalTickets(TOTAL_TICKETS)
-                            .soldTickets(0)
-                            .status(LuckyDraw.DrawStatus.ACTIVE)
-                            .prizePool(new BigDecimal("70000"))
-                            .ticketPrice(TICKET_PRICE)
-                            .build();
+                    LuckyDraw newDraw = new LuckyDraw();
+                    newDraw.totalTickets = TOTAL_TICKETS;
+                    newDraw.soldTickets = 0;
+                    newDraw.status = LuckyDraw.DrawStatus.ACTIVE;
+                    newDraw.prizePool = new BigDecimal("70000");
+                    newDraw.ticketPrice = TICKET_PRICE;
                     return luckyDrawRepository.save(newDraw);
                 });
     }
 
     @Transactional
     public void executeDraw(LuckyDraw draw) {
-        List<LuckyDrawTicket> allTickets = ticketRepository.findByDrawId(draw.getId());
+        List<LuckyDrawTicket> allTickets = ticketRepository.findByDrawId(draw.id);
         Collections.shuffle(allTickets);
 
         Map<Integer, BigDecimal> prizeStructure = getPrizeStructure();
 
         for (int i = 0; i < Math.min(TOTAL_WINNERS, allTickets.size()); i++) {
             LuckyDrawTicket ticket = allTickets.get(i);
-            ticket.setIsWinner(true);
-            ticket.setPrizeRank(i + 1);
-            ticket.setPrizeAmount(getPrizeForRank(i + 1));
+            ticket.isWinner = true;
+            ticket.prizeRank = i + 1;
+            ticket.prizeAmount = getPrizeForRank(i + 1);
             ticketRepository.save(ticket);
 
-            User winner = userRepository.findById(ticket.getUserId()).orElse(null);
+            User winner = userRepository.findById(ticket.userId).orElse(null);
             if (winner != null) {
-                BigDecimal prize = ticket.getPrizeAmount();
-                winner.setDirectWallet(winner.getDirectWallet().add(prize));
+                BigDecimal prize = ticket.prizeAmount;
+                winner.directWallet = winner.directWallet.add(prize);
                 userRepository.save(winner);
 
-                Income income = Income.builder()
-                        .userId(winner.getId())
-                        .type(Income.IncomeType.LUCKY_DRAW)
-                        .amount(prize)
-                        .level(ticket.getPrizeRank())
-                        .description("Lucky Draw Rank #" + ticket.getPrizeRank() + " Prize")
-                        .build();
+                Income income = new Income();
+                income.userId = winner.id;
+                income.type = Income.IncomeType.LUCKY_DRAW;
+                income.amount = prize;
+                income.level = ticket.prizeRank;
+                income.description = "Lucky Draw Rank #" + ticket.prizeRank + " Prize";
                 incomeRepository.save(income);
 
-                Transaction transaction = Transaction.builder()
-                        .userId(winner.getId())
-                        .type(Transaction.TransactionType.LUCKY_DRAW_WIN)
-                        .amount(prize)
-                        .walletType(Transaction.WalletType.DIRECT)
-                        .description("Lucky Draw Win - Rank #" + ticket.getPrizeRank())
-                        .build();
+                Transaction transaction = new Transaction();
+                transaction.userId = winner.id;
+                transaction.type = Transaction.TransactionType.LUCKY_DRAW_WIN;
+                transaction.amount = prize;
+                transaction.walletType = Transaction.WalletType.DIRECT;
+                transaction.description = "Lucky Draw Win - Rank #" + ticket.prizeRank;
                 transactionRepository.save(transaction);
             }
         }
 
-        draw.setStatus(LuckyDraw.DrawStatus.COMPLETED);
-        draw.setDrawDate(LocalDateTime.now());
+        draw.status = LuckyDraw.DrawStatus.COMPLETED;
+        draw.drawDate = LocalDateTime.now();
         luckyDrawRepository.save(draw);
 
-        LuckyDraw newDraw = LuckyDraw.builder()
-                .totalTickets(TOTAL_TICKETS)
-                .soldTickets(0)
-                .status(LuckyDraw.DrawStatus.ACTIVE)
-                .prizePool(new BigDecimal("70000"))
-                .ticketPrice(TICKET_PRICE)
-                .build();
+        LuckyDraw newDraw = new LuckyDraw();
+        newDraw.totalTickets = TOTAL_TICKETS;
+        newDraw.soldTickets = 0;
+        newDraw.status = LuckyDraw.DrawStatus.ACTIVE;
+        newDraw.prizePool = new BigDecimal("70000");
+        newDraw.ticketPrice = TICKET_PRICE;
         luckyDrawRepository.save(newDraw);
     }
 

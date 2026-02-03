@@ -14,15 +14,15 @@ import javax.validation.constraints.Size;
 public class RegisterRequest {
     @NotBlank
     @Email
-    private String email;
+    public String email;
 
     @NotBlank
     @Size(min = 6)
-    private String password;
+    public String password;
 
     @NotBlank
     @Size(min = 3, max = 20)
-    private String username;
+    public String username;
 
-    private String referralCode;
+    public String referralCode;
 }

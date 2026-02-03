@@ -18,64 +18,80 @@ import java.time.LocalDateTime;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    public Long id;
 
     @Version
     private Long version;
 
     @Column(unique = true, nullable = false)
-    private String email;
+    public String email;
 
     @Column(nullable = false)
-    private String password;
+    public String password;
 
     @Column(unique = true, nullable = false)
-    private String username;
+    public String username;
 
     @Column(unique = true, nullable = false)
-    private String referralCode;
+    public String referralCode;
 
-    private String referredBy;
-
-    @Builder.Default
-    private BigDecimal practiceBalance = new BigDecimal("100.00");
+    public String referredBy;
 
     @Builder.Default
-    private BigDecimal cashBalance = BigDecimal.ZERO;
+    public BigDecimal practiceBalance = new BigDecimal("100.00");
 
     @Builder.Default
-    private BigDecimal directWallet = BigDecimal.ZERO;
+    public BigDecimal cashBalance = BigDecimal.ZERO;
 
     @Builder.Default
-    private BigDecimal luckyDrawWallet = BigDecimal.ZERO;
+    public BigDecimal directWallet = BigDecimal.ZERO;
 
     @Builder.Default
-    private BigDecimal totalDeposits = BigDecimal.ZERO;
+    public BigDecimal luckyDrawWallet = BigDecimal.ZERO;
 
     @Builder.Default
-    private BigDecimal totalLosses = BigDecimal.ZERO;
+    public BigDecimal totalDeposits = BigDecimal.ZERO;
 
     @Builder.Default
-    private BigDecimal cashbackReceived = BigDecimal.ZERO;
+    public BigDecimal totalLosses = BigDecimal.ZERO;
 
     @Builder.Default
-    private BigDecimal totalWinnings = BigDecimal.ZERO;
+    public BigDecimal cashbackReceived = BigDecimal.ZERO;
 
     @Builder.Default
-    private LocalDateTime registrationDate = LocalDateTime.now();
+    public BigDecimal totalWinnings = BigDecimal.ZERO;
 
     @Builder.Default
-    private Boolean activated = false;
-
-    private LocalDateTime activationDate;
+    public LocalDateTime registrationDate = LocalDateTime.now();
 
     @Builder.Default
-    private Integer directReferrals = 0;
+    public Boolean activated = false;
+
+    public LocalDateTime activationDate;
+
+    @Builder.Default
+    public Integer directReferrals = 0;
 
     @Builder.Default
     private String role = "USER";
 
     public Long getId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String getRole() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getDirectWallet() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getCashbackReceived() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getPracticeBalance() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

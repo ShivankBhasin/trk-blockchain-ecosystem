@@ -20,21 +20,21 @@ public class Income {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    public Long userId;
 
     @Enumerated(EnumType.STRING)
-    private IncomeType type;
+    public IncomeType type;
 
-    private BigDecimal amount;
+    public BigDecimal amount;
 
-    private Long sourceUserId;
+    public Long sourceUserId;
 
-    private Integer level;
+    public Integer level;
 
     @Builder.Default
-    private LocalDateTime timestamp = LocalDateTime.now();
+    public LocalDateTime timestamp = LocalDateTime.now();
 
-    private String description;
+    public String description;
 
     public enum IncomeType {
         DIRECT_LEVEL, WINNER_LEVEL, CASHBACK, ROI_ON_ROI, CLUB, LUCKY_DRAW, PRACTICE_REFERRAL

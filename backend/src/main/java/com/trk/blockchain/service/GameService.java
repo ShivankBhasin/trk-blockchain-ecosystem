@@ -18,35 +18,34 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GameService {
 
-    private final UserRepository userRepository;
-    private final GameRepository gameRepository;
-    private final TransactionRepository transactionRepository;
-    private final ReferralRepository referralRepository;
-    private final IncomeRepository incomeRepository;
-    private final CashbackRepository cashbackRepository;
+    private UserRepository userRepository;
+    private GameRepository gameRepository;
+    private TransactionRepository transactionRepository;
+    private ReferralRepository referralRepository;
+    private IncomeRepository incomeRepository;
+    private CashbackRepository cashbackRepository;
 
-    private final SecureRandom secureRandom = new SecureRandom();
+    private SecureRandom secureRandom = new SecureRandom(); 
     private static final BigDecimal MULTIPLIER = new BigDecimal("8");
     private static final double WIN_PROBABILITY = 0.125;
 
     @Transactional
     public GameResponse playGame(User user, GameRequest request) {
-        Game.GameType gameType = Game.GameType.valueOf(request.getGameType().toUpperCase());
-        BigDecimal betAmount = request.getBetAmount();
+        Game.GameType gameType = Game.GameType.valueOf(request.gameType.toUpperCase());
+        BigDecimal betAmount = request.betAmount;
 
-        validateBet(user, gameType, betAmount, request.getSelectedNumber());
+        validateBet(user, gameType, betAmount, request.selectedNumber);
 
         boolean isWin = secureRandom.nextDouble() < WIN_PROBABILITY;
-        int winningNumber = isWin ? request.getSelectedNumber() : generateLosingNumber(request.getSelectedNumber());
+        int winningNumber = isWin ? request.selectedNumber : generateLosingNumber(request.selectedNumber);
 
-        Game game = Game.builder()
-                .userId(user.getId())
-                .gameType(gameType)
-                .betAmount(betAmount)
-                .selectedNumber(request.getSelectedNumber())
-                .winningNumber(winningNumber)
-                .multiplier(MULTIPLIER)
-                .build();
+        Game game = new Game();
+        game.userId = user.id;
+        game.gameType = gameType;
+        game.betAmount = betAmount;
+        game.selectedNumber = request.selectedNumber;
+        game.winningNumber = winningNumber;
+        game.multiplier = MULTIPLIER;
 
         BigDecimal newBalance;
         BigDecimal payout = BigDecimal.ZERO;
@@ -55,51 +54,51 @@ public class GameService {
         String message;
 
         if (isWin) {
-            game.setResult(Game.GameResult.WIN);
+            game.result = Game.GameResult.WIN;
             payout = betAmount.multiply(MULTIPLIER);
-            game.setPayout(payout);
+            game.payout = payout;
 
             if (gameType == Game.GameType.PRACTICE) {
-                user.setPracticeBalance(user.getPracticeBalance().add(payout).subtract(betAmount));
-                newBalance = user.getPracticeBalance();
+                user.practiceBalance = user.practiceBalance.add(payout).subtract(betAmount);
+                newBalance = user.practiceBalance;
                 message = "Congratulations! You won " + payout + " USDT!";
             } else {
                 directPayout = payout.multiply(new BigDecimal("0.25"));
                 compoundPayout = payout.multiply(new BigDecimal("0.75"));
-                game.setDirectPayout(directPayout);
-                game.setCompoundPayout(compoundPayout);
+                game.directPayout = directPayout;
+                game.compoundPayout = compoundPayout;
 
-                user.setCashBalance(user.getCashBalance().subtract(betAmount).add(compoundPayout));
-                user.setDirectWallet(user.getDirectWallet().add(directPayout));
-                user.setTotalWinnings(user.getTotalWinnings().add(payout));
-                newBalance = user.getCashBalance();
+                user.cashBalance = user.cashBalance.subtract(betAmount).add(compoundPayout);
+                user.directWallet = user.directWallet.add(directPayout);
+                user.totalWinnings = user.totalWinnings.add(payout);
+                newBalance = user.cashBalance;
                 message = "Congratulations! You won " + payout + " USDT! (2X to wallet, 6X compounded)";
 
                 processWinnerLevelIncome(user, payout);
             }
 
-            createTransaction(user.getId(), Transaction.TransactionType.GAME_WIN, payout,
+            createTransaction(user.id, Transaction.TransactionType.GAME_WIN, payout,
                     gameType == Game.GameType.PRACTICE ? Transaction.WalletType.PRACTICE : Transaction.WalletType.CASH,
                     "Game win - " + MULTIPLIER + "x multiplier");
 
         } else {
-            game.setResult(Game.GameResult.LOSS);
-            game.setPayout(BigDecimal.ZERO);
+            game.result = Game.GameResult.LOSS;
+            game.payout = BigDecimal.ZERO;
 
             if (gameType == Game.GameType.PRACTICE) {
-                user.setPracticeBalance(user.getPracticeBalance().subtract(betAmount));
-                newBalance = user.getPracticeBalance();
+                user.practiceBalance = user.practiceBalance.subtract(betAmount);
+                newBalance = user.practiceBalance;
             } else {
-                user.setCashBalance(user.getCashBalance().subtract(betAmount));
-                user.setTotalLosses(user.getTotalLosses().add(betAmount));
-                newBalance = user.getCashBalance();
+                user.cashBalance = user.cashBalance.subtract(betAmount);
+                user.totalLosses = user.totalLosses.add(betAmount);
+                newBalance = user.cashBalance;
 
                 updateCashback(user, betAmount);
             }
 
             message = "Better luck next time! The winning number was " + winningNumber;
 
-            createTransaction(user.getId(), Transaction.TransactionType.GAME_LOSS, betAmount,
+            createTransaction(user.id, Transaction.TransactionType.GAME_LOSS, betAmount,
                     gameType == Game.GameType.PRACTICE ? Transaction.WalletType.PRACTICE : Transaction.WalletType.CASH,
                     "Game loss");
         }
@@ -107,19 +106,20 @@ public class GameService {
         userRepository.save(user);
         gameRepository.save(game);
 
-        return GameResponse.builder()
-                .gameId(game.getId())
-                .gameType(gameType.name())
-                .betAmount(betAmount)
-                .result(game.getResult().name())
-                .selectedNumber(request.getSelectedNumber())
-                .winningNumber(winningNumber)
-                .payout(payout)
-                .directPayout(directPayout)
-                .compoundPayout(compoundPayout)
-                .newBalance(newBalance)
-                .message(message)
-                .build();
+        GameResponse response = new GameResponse();
+        response.gameId = game.id;
+        response.gameType = gameType.name();
+        response.betAmount = betAmount;
+        response.result = game.result.name();
+        response.selectedNumber = request.selectedNumber;
+        response.winningNumber = winningNumber;
+        response.payout = payout;
+        response.directPayout = directPayout;
+        response.compoundPayout = compoundPayout;
+        response.newBalance = newBalance;
+        response.message = message;
+
+        return response;
     }
 
     private void validateBet(User user, Game.GameType gameType, BigDecimal betAmount, Integer selectedNumber) {
@@ -131,13 +131,13 @@ public class GameService {
             throw new BadRequestException("Selected number must be between 1 and 8");
         }
 
-        BigDecimal balance = gameType == Game.GameType.PRACTICE ? user.getPracticeBalance() : user.getCashBalance();
+        BigDecimal balance = gameType == Game.GameType.PRACTICE ? user.practiceBalance : user.cashBalance;
 
         if (balance.compareTo(betAmount) < 0) {
             throw new InsufficientBalanceException("Insufficient balance for this bet");
         }
 
-        if (gameType == Game.GameType.CASH && !user.getActivated()) {
+        if (gameType == Game.GameType.CASH && !user.activated) {
             throw new BadRequestException("Please activate your account with a minimum 10 USDT deposit to play cash games");
         }
     }
@@ -151,10 +151,10 @@ public class GameService {
     }
 
     private void processWinnerLevelIncome(User winner, BigDecimal winAmount) {
-        if (winner.getReferredBy() == null) return;
+        if (winner.referredBy == null) return;
 
-        User referrer = userRepository.findByReferralCode(winner.getReferredBy()).orElse(null);
-        if (referrer == null || !referrer.getActivated()) return;
+        User referrer = userRepository.findByReferralCode(winner.referredBy).orElse(null);
+        if (referrer == null || !referrer.activated) return;
 
         processWinnerIncomeChain(referrer, winner, winAmount, 1);
     }
@@ -162,29 +162,28 @@ public class GameService {
     private void processWinnerIncomeChain(User referrer, User winner, BigDecimal winAmount, int level) {
         if (level > 15 || referrer == null) return;
 
-        if (referrer.getActivated() && referrer.getDirectReferrals() >= level) {
+        if (referrer.activated && referrer.directReferrals >= level) {
             BigDecimal commissionRate = getWinnerLevelCommissionRate(level);
             BigDecimal commission = winAmount.multiply(commissionRate);
 
-            referrer.setDirectWallet(referrer.getDirectWallet().add(commission));
+            referrer.directWallet = referrer.directWallet.add(commission);
             userRepository.save(referrer);
 
-            Income income = Income.builder()
-                    .userId(referrer.getId())
-                    .type(Income.IncomeType.WINNER_LEVEL)
-                    .amount(commission)
-                    .sourceUserId(winner.getId())
-                    .level(level)
-                    .description("Level " + level + " winner income from " + winner.getUsername())
-                    .build();
+            Income income = new Income();
+            income.userId = referrer.id;
+            income.type = Income.IncomeType.WINNER_LEVEL;
+            income.amount = commission;
+            income.sourceUserId = winner.id;
+            income.level = level;
+            income.description = "Level " + level + " winner income from " + winner.username;
             incomeRepository.save(income);
 
-            createTransaction(referrer.getId(), Transaction.TransactionType.REFERRAL_INCOME, commission,
+            createTransaction(referrer.id, Transaction.TransactionType.REFERRAL_INCOME, commission,
                     Transaction.WalletType.DIRECT, "Winner level " + level + " income");
         }
 
-        if (referrer.getReferredBy() != null) {
-            User nextReferrer = userRepository.findByReferralCode(referrer.getReferredBy()).orElse(null);
+        if (referrer.referredBy != null) {
+            User nextReferrer = userRepository.findByReferralCode(referrer.referredBy).orElse(null);
             processWinnerIncomeChain(nextReferrer, winner, winAmount, level + 1);
         }
     }
@@ -198,23 +197,24 @@ public class GameService {
     }
 
     private void updateCashback(User user, BigDecimal lossAmount) {
-        Cashback cashback = cashbackRepository.findByUserId(user.getId()).orElse(null);
+        Cashback cashback = cashbackRepository.findByUserId(user.id).orElse(null);
         if (cashback == null) {
-            cashback = Cashback.builder().userId(user.getId()).build();
+            cashback = new Cashback();
+            cashback.userId = user.id;
         }
 
-        cashback.setTotalLosses(cashback.getTotalLosses().add(lossAmount));
+        cashback.totalLosses = cashback.totalLosses.add(lossAmount);
 
-        if (cashback.getTotalLosses().compareTo(new BigDecimal("100")) >= 0 && !cashback.getActive()) {
-            cashback.setActive(true);
-            int directRefs = user.getDirectReferrals();
+        if (cashback.totalLosses.compareTo(new BigDecimal("100")) >= 0 && !cashback.active) {
+            cashback.active = true;
+            int directRefs = user.directReferrals;
             int multiplier = 1;
             if (directRefs >= 20) multiplier = 8;
             else if (directRefs >= 10) multiplier = 4;
             else if (directRefs >= 5) multiplier = 2;
 
-            cashback.setCappingMultiplier(multiplier);
-            cashback.setMaxCapping(cashback.getTotalLosses().multiply(new BigDecimal(multiplier)));
+            cashback.cappingMultiplier = multiplier;
+            cashback.maxCapping = cashback.totalLosses.multiply(new BigDecimal(multiplier));
         }
 
         cashbackRepository.save(cashback);
@@ -222,13 +222,12 @@ public class GameService {
 
     private void createTransaction(Long userId, Transaction.TransactionType type, BigDecimal amount,
                                    Transaction.WalletType walletType, String description) {
-        Transaction transaction = Transaction.builder()
-                .userId(userId)
-                .type(type)
-                .amount(amount)
-                .walletType(walletType)
-                .description(description)
-                .build();
+        Transaction transaction = new Transaction();
+        transaction.userId = userId;
+        transaction.type = type;
+        transaction.amount = amount;
+        transaction.walletType = walletType;
+        transaction.description = description;
         transactionRepository.save(transaction);
     }
 

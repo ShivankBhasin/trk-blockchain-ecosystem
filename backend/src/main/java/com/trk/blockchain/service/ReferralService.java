@@ -21,30 +21,39 @@ public class ReferralService {
     private final ReferralRepository referralRepository;
     private final IncomeRepository incomeRepository;
 
+    public ReferralService(IncomeRepository incomeRepository, ReferralRepository referralRepository, UserRepository userRepository) {
+        this.incomeRepository = incomeRepository;
+        this.referralRepository = referralRepository;
+        this.userRepository = userRepository;
+    }
+
     public ReferralDTO getReferralInfo(User user) {
-        List<User> directReferrals = userRepository.findByReferredBy(user.getReferralCode());
-        Integer totalReferrals = referralRepository.countTotalReferrals(user.getId());
-        BigDecimal totalEarnings = incomeRepository.sumTotalIncomeByUserId(user.getId());
+        List<User> directReferrals = userRepository.findByReferredBy(user.referralCode);
+        Integer totalReferrals = referralRepository.countTotalReferrals(user.id);
+        BigDecimal totalEarnings = incomeRepository.sumTotalIncomeByUserId(user.id);
 
         List<ReferralDTO.ReferralMember> members = directReferrals.stream()
-                .map(ref -> ReferralDTO.ReferralMember.builder()
-                        .id(ref.getId())
-                        .username(ref.getUsername())
-                        .level(1)
-                        .deposits(ref.getTotalDeposits())
-                        .joinedAt(ref.getRegistrationDate())
-                        .activated(ref.getActivated())
-                        .build())
+                .map(ref -> {
+                    ReferralDTO.ReferralMember member = new ReferralDTO.ReferralMember();
+                    member.id = ref.id;
+                    member.username = ref.username;
+                    member.level = 1;
+                    member.deposits = ref.totalDeposits;
+                    member.joinedAt = ref.registrationDate;
+                    member.activated = ref.activated;
+                    return member;
+                })
                 .collect(Collectors.toList());
 
-        return ReferralDTO.builder()
-                .referralCode(user.getReferralCode())
-                .referralLink("https://trk.blockchain/ref/" + user.getReferralCode())
-                .totalReferrals(totalReferrals != null ? totalReferrals : 0)
-                .directReferrals(user.getDirectReferrals())
-                .totalEarnings(totalEarnings != null ? totalEarnings : BigDecimal.ZERO)
-                .directMembers(members)
-                .build();
+        ReferralDTO referralDTO = new ReferralDTO();
+        referralDTO.referralCode = user.referralCode;
+        referralDTO.referralLink = "https://trk.blockchain/ref/" + user.referralCode;
+        referralDTO.totalReferrals = totalReferrals != null ? totalReferrals : 0;
+        referralDTO.directReferrals = user.directReferrals;
+        referralDTO.totalEarnings = totalEarnings != null ? totalEarnings : BigDecimal.ZERO;
+        referralDTO.directMembers = members;
+
+        return referralDTO;
     }
 
     public List<Referral> getReferralsByLevel(Long userId, int level) {

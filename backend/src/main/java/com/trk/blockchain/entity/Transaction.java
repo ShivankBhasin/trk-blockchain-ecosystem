@@ -18,24 +18,24 @@ import java.time.LocalDateTime;
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    public Long id;
 
-    private Long userId;
-
-    @Enumerated(EnumType.STRING)
-    private TransactionType type;
-
-    private BigDecimal amount;
+    public Long userId;
 
     @Enumerated(EnumType.STRING)
-    private WalletType walletType;
+    public TransactionType type;
+
+    public BigDecimal amount;
+
+    @Enumerated(EnumType.STRING)
+    public WalletType walletType;
 
     @Builder.Default
-    private LocalDateTime timestamp = LocalDateTime.now();
+    public LocalDateTime timestamp = LocalDateTime.now();
 
-    private String description;
+    public String description;
 
-    private String txHash;
+    public String txHash;
 
     public enum TransactionType {
         DEPOSIT, WITHDRAWAL, GAME_BET, GAME_WIN, GAME_LOSS, TRANSFER, REFERRAL_INCOME, CASHBACK, LUCKY_DRAW_ENTRY, LUCKY_DRAW_WIN

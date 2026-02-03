@@ -14,7 +14,10 @@ import com.trk.blockchain.repository.ReferralRepository;
 import com.trk.blockchain.repository.UserRepository;
 import com.trk.blockchain.security.JwtUtils;
 import com.trk.blockchain.security.UserDetailsImpl;
+
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,11 +27,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
+
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
@@ -39,146 +42,217 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
 
+    public AuthService(AuthenticationManager authenticationManager, CashbackRepository cashbackRepository, PasswordEncoder encoder, IncomeRepository incomeRepository, JwtUtils jwtUtils, ReferralRepository referralRepository, UserRepository userRepository) {
+        this.authenticationManager = authenticationManager;
+        this.cashbackRepository = cashbackRepository;
+        this.encoder = encoder;
+        this.incomeRepository = incomeRepository;
+        this.jwtUtils = jwtUtils;
+        this.referralRepository = referralRepository;
+        this.userRepository = userRepository;
+    }
+
     public AuthResponse authenticateUser(AuthRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                loginRequest.email,
+                                loginRequest.password
+                        )
+                );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        User user = userRepository.findByEmail(userDetails.getEmail()).orElseThrow();
+        UserDetailsImpl userDetails =
+                (UserDetailsImpl) authentication.getPrincipal();
 
-        return AuthResponse.builder()
-                .token(jwt)
-                .type("Bearer")
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .referralCode(user.getReferralCode())
-                .build();
+        User user =
+                userRepository
+                        .findByEmail(userDetails.email)
+                        .orElseThrow();
+
+        AuthResponse response = new AuthResponse();
+        response.token = jwt;
+        response.type = "Bearer";
+        response.id = user.id;
+        response.email = user.email;
+        response.username = user.username;
+        response.referralCode = user.referralCode;
+
+        return response;
     }
 
     @Transactional
     public AuthResponse registerUser(RegisterRequest signUpRequest) {
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+
+        if (userRepository.existsByEmail(signUpRequest.email)) {
             throw new BadRequestException("Email is already in use");
         }
 
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+        if (userRepository.existsByUsername(signUpRequest.username)) {
             throw new BadRequestException("Username is already taken");
         }
 
         String referralCode = generateUniqueReferralCode();
 
-        User user = User.builder()
-                .email(signUpRequest.getEmail())
-                .password(encoder.encode(signUpRequest.getPassword()))
-                .username(signUpRequest.getUsername())
-                .referralCode(referralCode)
-                .referredBy(signUpRequest.getReferralCode())
-                .build();
+        User user = new User();
+        user.email = signUpRequest.email;
+        user.password = encoder.encode(signUpRequest.password);
+        user.username = signUpRequest.username;
+        user.referralCode = referralCode;
+        user.referredBy = signUpRequest.referralCode;
+        user.directReferrals = 0;
+        user.practiceBalance = BigDecimal.ZERO;
 
         user = userRepository.save(user);
 
-        Cashback cashback = Cashback.builder()
-                .userId(user.getId())
-                .build();
+        Cashback cashback = new Cashback();
+        cashback.userId = user.id;
         cashbackRepository.save(cashback);
 
-        if (signUpRequest.getReferralCode() != null && !signUpRequest.getReferralCode().isEmpty()) {
-            processReferral(user, signUpRequest.getReferralCode());
+        if (signUpRequest.referralCode != null &&
+                !signUpRequest.referralCode.isEmpty()) {
+            processReferral(user, signUpRequest.referralCode);
         }
 
-        String jwt = jwtUtils.generateTokenFromEmail(user.getEmail());
+        String jwt =
+                jwtUtils.generateTokenFromEmail(user.email);
 
-        return AuthResponse.builder()
-                .token(jwt)
-                .type("Bearer")
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .referralCode(user.getReferralCode())
-                .build();
+        AuthResponse response = new AuthResponse();
+        response.token = jwt;
+        response.type = "Bearer";
+        response.id = user.id;
+        response.email = user.email;
+        response.username = user.username;
+        response.referralCode = user.referralCode;
+
+        return response;
     }
 
     private void processReferral(User newUser, String referrerCode) {
-        User referrer = userRepository.findByReferralCode(referrerCode).orElse(null);
+
+        User referrer =
+                userRepository
+                        .findByReferralCode(referrerCode)
+                        .orElse(null);
+
         if (referrer == null) return;
 
-        referrer.setDirectReferrals(referrer.getDirectReferrals() + 1);
+        referrer.directReferrals =
+                referrer.directReferrals + 1;
         userRepository.save(referrer);
 
-        Referral directReferral = Referral.builder()
-                .userId(referrer.getId())
-                .referralId(newUser.getId())
-                .level(1)
-                .build();
+        Referral directReferral = new Referral();
+        directReferral.userId = referrer.id;
+        directReferral.referralId = newUser.id;
+        directReferral.level = 1;
         referralRepository.save(directReferral);
 
         BigDecimal practiceBonus = new BigDecimal("10.00");
-        referrer.setPracticeBalance(referrer.getPracticeBalance().add(practiceBonus));
+
+        referrer.practiceBalance =
+                referrer.practiceBalance.add(practiceBonus);
         userRepository.save(referrer);
 
-        Income income = Income.builder()
-                .userId(referrer.getId())
-                .type(Income.IncomeType.PRACTICE_REFERRAL)
-                .amount(practiceBonus)
-                .sourceUserId(newUser.getId())
-                .level(1)
-                .description("Practice referral bonus from " + newUser.getUsername())
-                .build();
+        Income income = new Income();
+        income.userId = referrer.id;
+        income.type = Income.IncomeType.PRACTICE_REFERRAL;
+        income.amount = practiceBonus;
+        income.sourceUserId = newUser.id;
+        income.level = 1;
+        income.description =
+                "Practice referral bonus from " + newUser.username;
         incomeRepository.save(income);
 
         buildReferralChain(referrer, newUser, 2);
     }
 
-    private void buildReferralChain(User currentReferrer, User newUser, int level) {
-        if (level > 15 || currentReferrer.getReferredBy() == null) return;
+    private void buildReferralChain(User currentReferrer,
+                                    User newUser,
+                                    int level) {
 
-        User uplineReferrer = userRepository.findByReferralCode(currentReferrer.getReferredBy()).orElse(null);
+        if (level > 15 || currentReferrer.referredBy == null)
+            return;
+
+        User uplineReferrer =
+                userRepository
+                        .findByReferralCode(
+                                currentReferrer.referredBy
+                        )
+                        .orElse(null);
+
         if (uplineReferrer == null) return;
 
-        Referral referral = Referral.builder()
-                .userId(uplineReferrer.getId())
-                .referralId(newUser.getId())
-                .level(level)
-                .build();
+        Referral referral = new Referral();
+        referral.userId = uplineReferrer.id;
+        referral.referralId = newUser.id;
+        referral.level = level;
         referralRepository.save(referral);
 
         BigDecimal bonus = getPracticeReferralBonus(level);
+
         if (bonus.compareTo(BigDecimal.ZERO) > 0) {
-            uplineReferrer.setPracticeBalance(uplineReferrer.getPracticeBalance().add(bonus));
+
+            uplineReferrer.practiceBalance =
+                    uplineReferrer.practiceBalance.add(bonus);
             userRepository.save(uplineReferrer);
 
-            Income income = Income.builder()
-                    .userId(uplineReferrer.getId())
-                    .type(Income.IncomeType.PRACTICE_REFERRAL)
-                    .amount(bonus)
-                    .sourceUserId(newUser.getId())
-                    .level(level)
-                    .description("Level " + level + " practice referral bonus")
-                    .build();
+            Income income = new Income();
+            income.userId = uplineReferrer.id;
+            income.type = Income.IncomeType.PRACTICE_REFERRAL;
+            income.amount = bonus;
+            income.sourceUserId = newUser.id;
+            income.level = level;
+            income.description =
+                    "Level " + level + " practice referral bonus";
             incomeRepository.save(income);
         }
 
         buildReferralChain(uplineReferrer, newUser, level + 1);
     }
 
+    // ================= BONUS TABLE =================
     private BigDecimal getPracticeReferralBonus(int level) {
-        if (level >= 2 && level <= 5) return new BigDecimal("2.00");
-        if (level >= 6 && level <= 10) return new BigDecimal("1.00");
-        if (level >= 11 && level <= 15) return new BigDecimal("0.50");
-        if (level >= 16 && level <= 50) return new BigDecimal("0.25");
-        if (level >= 51 && level <= 100) return new BigDecimal("0.10");
+
+        if (level >= 2 && level <= 5)
+            return new BigDecimal("2.00");
+
+        if (level >= 6 && level <= 10)
+            return new BigDecimal("1.00");
+
+        if (level >= 11 && level <= 15)
+            return new BigDecimal("0.50");
+
+        if (level >= 16 && level <= 50)
+            return new BigDecimal("0.25");
+
+        if (level >= 51 && level <= 100)
+            return new BigDecimal("0.10");
+
         return BigDecimal.ZERO;
     }
 
     private String generateUniqueReferralCode() {
+
         String code;
+
         do {
-            code = "TRK" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        } while (userRepository.existsByReferralCode(code));
+            code =
+                    "TRK" +
+                            UUID.randomUUID()
+                                    .toString()
+                                    .substring(0, 8)
+                                    .toUpperCase();
+        }
+        while (userRepository.existsByReferralCode(code));
+
         return code;
+    }
+
+    public AuthenticationManager getAuthenticationManager() {
+        return authenticationManager;
     }
 }

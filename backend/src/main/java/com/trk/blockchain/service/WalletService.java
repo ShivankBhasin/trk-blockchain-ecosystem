@@ -28,32 +28,37 @@ public class WalletService {
     private final TransactionRepository transactionRepository;
     private final IncomeRepository incomeRepository;
 
+    public WalletService(IncomeRepository incomeRepository, TransactionRepository transactionRepository, UserRepository userRepository) {
+        this.incomeRepository = incomeRepository;
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
+    }
+
     @Transactional
     public WalletDTO deposit(User user, DepositRequest request) {
-        BigDecimal amount = request.getAmount();
+        BigDecimal amount = request.amount;
 
         if (amount.compareTo(new BigDecimal("10")) < 0) {
             throw new BadRequestException("Minimum deposit is 10 USDT");
         }
 
-        user.setCashBalance(user.getCashBalance().add(amount));
-        user.setTotalDeposits(user.getTotalDeposits().add(amount));
+        user.cashBalance = user.cashBalance.add(amount);
+        user.totalDeposits = user.totalDeposits.add(amount);
 
-        if (!user.getActivated() && user.getTotalDeposits().compareTo(new BigDecimal("10")) >= 0) {
-            user.setActivated(true);
-            user.setActivationDate(LocalDateTime.now());
+        if (!user.activated && user.totalDeposits.compareTo(new BigDecimal("10")) >= 0) {
+            user.activated = true;
+            user.activationDate = LocalDateTime.now();
         }
 
         userRepository.save(user);
 
-        Transaction transaction = Transaction.builder()
-                .userId(user.getId())
-                .type(Transaction.TransactionType.DEPOSIT)
-                .amount(amount)
-                .walletType(Transaction.WalletType.CASH)
-                .txHash(request.getTxHash())
-                .description("USDT Deposit")
-                .build();
+        Transaction transaction = new Transaction();
+        transaction.userId = user.id;
+        transaction.type = Transaction.TransactionType.DEPOSIT;
+        transaction.amount = amount;
+        transaction.walletType = Transaction.WalletType.CASH;
+        transaction.txHash = request.txHash;
+        transaction.description = "USDT Deposit";
         transactionRepository.save(transaction);
 
         processDirectLevelIncome(user, amount);
@@ -62,10 +67,10 @@ public class WalletService {
     }
 
     private void processDirectLevelIncome(User depositor, BigDecimal depositAmount) {
-        if (depositor.getReferredBy() == null) return;
+        if (depositor.referredBy == null) return;
 
-        User referrer = userRepository.findByReferralCode(depositor.getReferredBy()).orElse(null);
-        if (referrer == null || !referrer.getActivated()) return;
+        User referrer = userRepository.findByReferralCode(depositor.referredBy).orElse(null);
+        if (referrer == null || !referrer.activated) return;
 
         processDirectLevelIncomeChain(referrer, depositor, depositAmount, 1);
     }
@@ -73,35 +78,33 @@ public class WalletService {
     private void processDirectLevelIncomeChain(User referrer, User depositor, BigDecimal depositAmount, int level) {
         if (level > 15 || referrer == null) return;
 
-        if (referrer.getActivated() && referrer.getDirectReferrals() >= level) {
+        if (referrer.activated && referrer.directReferrals >= level) {
             BigDecimal commissionRate = getDirectLevelCommissionRate(level);
             BigDecimal commission = depositAmount.multiply(commissionRate);
 
-            referrer.setDirectWallet(referrer.getDirectWallet().add(commission));
+            referrer.directWallet = referrer.directWallet.add(commission);
             userRepository.save(referrer);
 
-            Income income = Income.builder()
-                    .userId(referrer.getId())
-                    .type(Income.IncomeType.DIRECT_LEVEL)
-                    .amount(commission)
-                    .sourceUserId(depositor.getId())
-                    .level(level)
-                    .description("Level " + level + " direct income from " + depositor.getUsername())
-                    .build();
+            Income income = new Income();
+            income.userId = referrer.id;
+            income.type = Income.IncomeType.DIRECT_LEVEL;
+            income.amount = commission;
+            income.sourceUserId = depositor.id;
+            income.level = level;
+            income.description = "Level " + level + " direct income from " + depositor.username;
             incomeRepository.save(income);
 
-            Transaction transaction = Transaction.builder()
-                    .userId(referrer.getId())
-                    .type(Transaction.TransactionType.REFERRAL_INCOME)
-                    .amount(commission)
-                    .walletType(Transaction.WalletType.DIRECT)
-                    .description("Direct level " + level + " income")
-                    .build();
+            Transaction transaction = new Transaction();
+            transaction.userId = referrer.id;
+            transaction.type = Transaction.TransactionType.REFERRAL_INCOME;
+            transaction.amount = commission;
+            transaction.walletType = Transaction.WalletType.DIRECT;
+            transaction.description = "Direct level " + level + " income";
             transactionRepository.save(transaction);
         }
 
-        if (referrer.getReferredBy() != null) {
-            User nextReferrer = userRepository.findByReferralCode(referrer.getReferredBy()).orElse(null);
+        if (referrer.referredBy != null) {
+            User nextReferrer = userRepository.findByReferralCode(referrer.referredBy).orElse(null);
             processDirectLevelIncomeChain(nextReferrer, depositor, depositAmount, level + 1);
         }
     }
@@ -116,7 +119,7 @@ public class WalletService {
 
     @Transactional
     public WalletDTO withdraw(User user, WithdrawRequest request) {
-        BigDecimal amount = request.getAmount();
+        BigDecimal amount = request.amount;
         BigDecimal withdrawalFee = new BigDecimal("2");
 
         if (amount.compareTo(new BigDecimal("10")) < 0) {
@@ -127,27 +130,26 @@ public class WalletService {
             throw new BadRequestException("Maximum withdrawal is 5000 USDT per day");
         }
 
-        if (!user.getActivated()) {
+        if (!user.activated) {
             throw new BadRequestException("Please activate your account to withdraw");
         }
 
         BigDecimal totalRequired = amount.add(withdrawalFee);
-        if (user.getDirectWallet().compareTo(totalRequired) < 0) {
+        if (user.directWallet.compareTo(totalRequired) < 0) {
             throw new InsufficientBalanceException("Insufficient balance in direct wallet (amount + $2 fee required)");
         }
 
         BigDecimal netAmount = amount;
 
-        user.setDirectWallet(user.getDirectWallet().subtract(totalRequired));
+        user.directWallet = user.directWallet.subtract(totalRequired);
         userRepository.save(user);
 
-        Transaction transaction = Transaction.builder()
-                .userId(user.getId())
-                .type(Transaction.TransactionType.WITHDRAWAL)
-                .amount(netAmount)
-                .walletType(Transaction.WalletType.DIRECT)
-                .description("Withdrawal to " + request.getWalletAddress() + " (Fee: " + withdrawalFee + " USDT)")
-                .build();
+        Transaction transaction = new Transaction();
+        transaction.userId = user.id;
+        transaction.type = Transaction.TransactionType.WITHDRAWAL;
+        transaction.amount = netAmount;
+        transaction.walletType = Transaction.WalletType.DIRECT;
+        transaction.description = "Withdrawal to " + request.walletAddress + " (Fee: " + withdrawalFee + " USDT)";
         transactionRepository.save(transaction);
 
         return getWalletDTO(user);
@@ -155,9 +157,9 @@ public class WalletService {
 
     @Transactional
     public WalletDTO transfer(User user, TransferRequest request) {
-        BigDecimal amount = request.getAmount();
-        String from = request.getFromWallet().toUpperCase();
-        String to = request.getToWallet().toUpperCase();
+        BigDecimal amount = request.amount;
+        String from = request.fromWallet.toUpperCase();
+        String to = request.toWallet.toUpperCase();
 
         if (from.equals(to)) {
             throw new BadRequestException("Cannot transfer to the same wallet");
@@ -169,7 +171,7 @@ public class WalletService {
         }
 
         if (from.equals("PRACTICE")) {
-            if (user.getTotalDeposits().compareTo(new BigDecimal("100")) < 0) {
+            if (user.totalDeposits.compareTo(new BigDecimal("100")) < 0) {
                 throw new BadRequestException("Deposit 100+ USDT to transfer practice balance");
             }
         }
@@ -179,13 +181,12 @@ public class WalletService {
 
         userRepository.save(user);
 
-        Transaction transaction = Transaction.builder()
-                .userId(user.getId())
-                .type(Transaction.TransactionType.TRANSFER)
-                .amount(amount)
-                .walletType(Transaction.WalletType.valueOf(to))
-                .description("Transfer from " + from + " to " + to)
-                .build();
+        Transaction transaction = new Transaction();
+        transaction.userId = user.id;
+        transaction.type = Transaction.TransactionType.TRANSFER;
+        transaction.amount = amount;
+        transaction.walletType = Transaction.WalletType.valueOf(to);
+        transaction.description = "Transfer from " + from + " to " + to;
         transactionRepository.save(transaction);
 
         return getWalletDTO(user);
@@ -193,10 +194,10 @@ public class WalletService {
 
     private BigDecimal getWalletBalance(User user, String walletType) {
         switch (walletType) {
-            case "PRACTICE": return user.getPracticeBalance();
-            case "CASH": return user.getCashBalance();
-            case "DIRECT": return user.getDirectWallet();
-            case "LUCKY_DRAW": return user.getLuckyDrawWallet();
+            case "PRACTICE": return user.practiceBalance;
+            case "CASH": return user.cashBalance;
+            case "DIRECT": return user.directWallet;
+            case "LUCKY_DRAW": return user.luckyDrawWallet;
             default: throw new BadRequestException("Invalid wallet type");
         }
     }
@@ -204,16 +205,16 @@ public class WalletService {
     private void deductFromWallet(User user, String walletType, BigDecimal amount) {
         switch (walletType) {
             case "PRACTICE":
-                user.setPracticeBalance(user.getPracticeBalance().subtract(amount));
+                user.practiceBalance = user.practiceBalance.subtract(amount);
                 break;
             case "CASH":
-                user.setCashBalance(user.getCashBalance().subtract(amount));
+                user.cashBalance = user.cashBalance.subtract(amount);
                 break;
             case "DIRECT":
-                user.setDirectWallet(user.getDirectWallet().subtract(amount));
+                user.directWallet = user.directWallet.subtract(amount);
                 break;
             case "LUCKY_DRAW":
-                user.setLuckyDrawWallet(user.getLuckyDrawWallet().subtract(amount));
+                user.luckyDrawWallet = user.luckyDrawWallet.subtract(amount);
                 break;
         }
     }
@@ -221,33 +222,33 @@ public class WalletService {
     private void addToWallet(User user, String walletType, BigDecimal amount) {
         switch (walletType) {
             case "PRACTICE":
-                user.setPracticeBalance(user.getPracticeBalance().add(amount));
+                user.practiceBalance = user.practiceBalance.add(amount);
                 break;
             case "CASH":
-                user.setCashBalance(user.getCashBalance().add(amount));
+                user.cashBalance = user.cashBalance.add(amount);
                 break;
             case "DIRECT":
-                user.setDirectWallet(user.getDirectWallet().add(amount));
+                user.directWallet = user.directWallet.add(amount);
                 break;
             case "LUCKY_DRAW":
-                user.setLuckyDrawWallet(user.getLuckyDrawWallet().add(amount));
+                user.luckyDrawWallet = user.luckyDrawWallet.add(amount);
                 break;
         }
     }
 
     public WalletDTO getWalletDTO(User user) {
-        BigDecimal totalBalance = user.getPracticeBalance()
-                .add(user.getCashBalance())
-                .add(user.getDirectWallet())
-                .add(user.getLuckyDrawWallet());
+        BigDecimal totalBalance = user.practiceBalance
+                .add(user.cashBalance)
+                .add(user.directWallet)
+                .add(user.luckyDrawWallet);
 
-        return WalletDTO.builder()
-                .practiceBalance(user.getPracticeBalance())
-                .cashBalance(user.getCashBalance())
-                .directWallet(user.getDirectWallet())
-                .luckyDrawWallet(user.getLuckyDrawWallet())
-                .totalBalance(totalBalance)
-                .build();
+        WalletDTO walletDTO = new WalletDTO();
+        walletDTO.practiceBalance = user.practiceBalance;
+        walletDTO.cashBalance = user.cashBalance;
+        walletDTO.directWallet = user.directWallet;
+        walletDTO.luckyDrawWallet = user.luckyDrawWallet;
+        walletDTO.totalBalance = totalBalance;
+        return walletDTO;
     }
 
     public List<Transaction> getTransactionHistory(Long userId) {

@@ -20,25 +20,41 @@ public class Cashback {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    public Long userId;
 
     @Builder.Default
-    private BigDecimal totalLosses = BigDecimal.ZERO;
+    public BigDecimal totalLosses = BigDecimal.ZERO;
 
     @Builder.Default
-    private BigDecimal dailyRate = new BigDecimal("0.005");
+    public BigDecimal dailyRate = new BigDecimal("0.005");
 
     @Builder.Default
-    private Integer cappingMultiplier = 1;
+    public Integer cappingMultiplier = 1;
 
     @Builder.Default
-    private BigDecimal totalReceived = BigDecimal.ZERO;
+    public BigDecimal totalReceived = BigDecimal.ZERO;
 
     @Builder.Default
-    private BigDecimal maxCapping = BigDecimal.ZERO;
+    public BigDecimal maxCapping = BigDecimal.ZERO;
 
-    private LocalDate lastCreditDate;
+    public LocalDate lastCreditDate;
 
     @Builder.Default
-    private Boolean active = false;
+    public Boolean active = false;
+
+    public Object getLastCreditDate() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getTotalReceived() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getTotalLosses() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public BigDecimal getDailyRate() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

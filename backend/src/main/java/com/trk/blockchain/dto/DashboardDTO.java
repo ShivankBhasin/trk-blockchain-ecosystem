@@ -12,29 +12,29 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DashboardDTO {
-    private UserDTO user;
-    private WalletDTO wallet;
-    private BigDecimal totalIncome;
-    private Integer totalGamesPlayed;
-    private Integer gamesWon;
-    private Integer gamesLost;
-    private BigDecimal winRate;
-    private Integer directReferrals;
-    private Integer totalTeamSize;
-    private Integer daysUntilExpiry;
-    private Boolean isPracticeExpiring;
-    private CashbackInfo cashback;
+    public UserDTO user;
+    public WalletDTO wallet;
+    public BigDecimal totalIncome;
+    public Integer totalGamesPlayed;
+    public Integer gamesWon;
+    public Integer gamesLost;
+    public BigDecimal winRate;
+    public Integer directReferrals;
+    public Integer totalTeamSize;
+    public Integer daysUntilExpiry;
+    public Boolean isPracticeExpiring;
+    public CashbackInfo cashback;
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CashbackInfo {
-        private Boolean active;
-        private BigDecimal totalLosses;
-        private BigDecimal dailyRate;
-        private BigDecimal totalReceived;
-        private BigDecimal maxCapping;
-        private BigDecimal remaining;
+        public Boolean active;
+        public BigDecimal totalLosses;
+        public BigDecimal dailyRate;
+        public BigDecimal totalReceived;
+        public BigDecimal maxCapping;
+        public BigDecimal remaining;
     }
 }

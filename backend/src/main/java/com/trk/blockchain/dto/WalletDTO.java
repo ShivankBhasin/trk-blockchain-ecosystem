@@ -12,9 +12,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WalletDTO {
-    private BigDecimal practiceBalance;
-    private BigDecimal cashBalance;
-    private BigDecimal directWallet;
-    private BigDecimal luckyDrawWallet;
-    private BigDecimal totalBalance;
+    public BigDecimal practiceBalance;
+    public BigDecimal cashBalance;
+    public BigDecimal directWallet;
+    public BigDecimal luckyDrawWallet;
+    public BigDecimal totalBalance;
 }

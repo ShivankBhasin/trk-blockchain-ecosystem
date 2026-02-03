@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
-    private String token;
-    private String type = "Bearer";
-    private Long id;
-    private String email;
-    private String username;
-    private String referralCode;
+    public String token;
+    public String type = "Bearer";
+    public Long id;
+    public String email;
+    public String username;
+    public String referralCode;
 }

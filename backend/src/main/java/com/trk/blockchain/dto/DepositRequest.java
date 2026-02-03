@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 public class DepositRequest {
     @NotNull
     @Min(10)
-    private BigDecimal amount;
+    public BigDecimal amount;
 
-    private String txHash;
+    public String txHash;
 }
