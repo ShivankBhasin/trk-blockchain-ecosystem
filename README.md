@@ -1,0 +1,227 @@
+# TRK Blockchain Real Cash Game Ecosystem
+
+A comprehensive blockchain-based gaming platform built with Angular 18 and Spring Boot.
+
+## Quick Start
+
+```bash
+# Start the entire application
+./start.sh
+
+# Stop the application
+./stop.sh
+```
+
+The application will be available at:
+- **Frontend**: http://localhost:4200
+- **Backend**: http://localhost:8080
+- **H2 Console**: http://localhost:8080/h2-console
+
+## Project Structure
+
+```
+blockchain/
+├── frontend/                    # Angular 18 frontend application
+│   └── trk-blockchain/
+│       ├── src/
+│       │   ├── app/
+│       │   │   ├── core/        # Services, guards, interceptors
+│       │   │   ├── features/    # Feature modules
+│       │   │   ├── layout/      # Layout components
+│       │   │   └── models/      # TypeScript interfaces
+│       │   └── environments/
+│       └── angular.json
+├── backend/                     # Spring Boot backend application
+│   ├── src/main/java/com/trk/blockchain/
+│   │   ├── controller/          # REST API endpoints
+│   │   ├── service/             # Business logic
+│   │   ├── repository/          # Data access
+│   │   ├── entity/              # JPA entities
+│   │   ├── dto/                 # Data transfer objects
+│   │   ├── security/            # JWT authentication
+│   │   ├── config/              # Configuration
+│   │   └── exception/           # Custom exceptions
+│   └── pom.xml
+└── README.md
+```
+
+## Features
+
+### Gaming System
+- 8x multiplier game mechanics (12.5% win rate)
+- Practice mode with non-withdrawable balance
+- Cash game with real USDT
+
+### 7 Income Streams
+1. Winners 8X Income - From your game wins
+2. Direct Level Income - 15 levels (5%, 2%, 1%, 0.5%)
+3. Winner Level Income - 15 levels from team wins
+4. Cashback Protection - 0.5% daily loss recovery
+5. ROI on ROI - 15 levels from team cashback
+6. Club Income - Platform turnover percentage
+7. Lucky Draw Income - Jackpot wins
+
+### Lucky Draw System
+- 10,000 tickets per draw
+- 1,000 winners per draw
+- 70,000 USDT prize pool
+- Prize structure: 10,000 to 20 USDT
+
+### Referral System
+- 15-level deep referral structure
+- Commission on deposits and wins
+- Activation requirements
+
+### Wallet System
+- Cash Balance
+- Practice Balance
+- Direct Wallet
+- Lucky Draw Wallet
+- BEP20 (BSC) integration
+
+## Prerequisites
+
+### Frontend
+- Node.js 18+
+- npm 9+
+
+### Backend
+- Java 21 (OpenJDK recommended)
+- Maven 3.8+ (included via wrapper)
+
+## Setup
+
+### Option 1: Using Shell Scripts (Recommended)
+
+```bash
+# Start both frontend and backend
+./start.sh
+
+# Stop the application
+./stop.sh
+```
+
+### Option 2: Manual Setup
+
+#### Frontend
+
+```bash
+cd frontend/trk-blockchain
+npm install
+npm start
+```
+
+The frontend runs on http://localhost:4200
+
+#### Backend
+
+```bash
+cd backend
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+./mvnw spring-boot:run
+```
+
+The backend runs on http://localhost:8080
+
+## Building for Production
+
+### Frontend
+
+```bash
+cd frontend/trk-blockchain
+npm run build
+```
+
+Output in `dist/trk-blockchain/`
+
+### Backend
+
+```bash
+cd backend
+./mvnw clean package -DskipTests
+java -jar target/blockchain-1.0.0.jar
+```
+
+## API Endpoints
+
+### Authentication
+- POST /api/auth/register - Register new user
+- POST /api/auth/login - User login
+
+### User
+- GET /api/user/me - Current user info
+- GET /api/user/dashboard - Dashboard data
+
+### Game
+- POST /api/game/play - Play a game
+- GET /api/game/history - Game history
+
+### Wallet
+- GET /api/wallet - Wallet balances
+- POST /api/wallet/deposit - Deposit USDT
+- POST /api/wallet/withdraw - Withdraw USDT
+- POST /api/wallet/transfer - Transfer between wallets
+- GET /api/wallet/transactions - Transaction history
+
+### Referral
+- GET /api/referral/info - Referral info and stats
+- GET /api/referral/team - Team members
+
+### Income
+- GET /api/income/overview - Income overview
+- GET /api/income/history - Income history
+
+### Lucky Draw
+- GET /api/lucky-draw/current - Current draw info
+- POST /api/lucky-draw/buy - Buy tickets
+- GET /api/lucky-draw/history - Draw history
+
+## Technology Stack
+
+### Frontend
+- Angular 18
+- Bootstrap 5
+- RxJS
+- TypeScript 5
+
+### Backend
+- Spring Boot 2.7.18
+- Spring Security with JWT
+- Spring Data JPA
+- H2 Database (in-memory)
+- Lombok
+- Maven
+
+## Security
+
+- JWT-based authentication
+- BCrypt password hashing
+- CORS configured for frontend
+- Protected API endpoints
+
+## Database
+
+Using H2 in-memory database for development.
+
+Access H2 Console: http://localhost:8080/h2-console
+- JDBC URL: jdbc:h2:mem:trkdb
+- Username: sa
+- Password: (empty)
+
+## Shell Scripts
+
+| Script | Description |
+|--------|-------------|
+| `start.sh` | Starts both backend and frontend servers |
+| `stop.sh` | Stops all running application processes |
+
+## Additional Documentation
+
+| File | Description |
+|------|-------------|
+| `RUN.md` | Detailed running instructions and troubleshooting |
+| `COMMIT_GUIDE.md` | Git commit timeline for development history |
+
+## License
+
+Proprietary - All rights reserved
