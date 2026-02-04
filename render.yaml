@@ -26,7 +26,6 @@ services:
     runtime: static
     buildCommand: cd frontend/trk-blockchain && npm install && npm run build -- --configuration=production
     staticPublishPath: ./frontend/trk-blockchain/dist/trk-blockchain/browser
-    region: oregon
     plan: free
     headers:
       - path: /*
