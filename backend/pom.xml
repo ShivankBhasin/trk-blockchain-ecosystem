@@ -18,7 +18,7 @@
     <description>TRK Blockchain Real Cash Game Ecosystem</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <jjwt.version>0.9.1</jjwt.version>
     </properties>
 

@@ -1,113 +1,113 @@
 <app-navbar></app-navbar>
-    <div class="container py-4">
-      <div *ngIf="loading" class="text-center py-5">
-        <div class="spinner-border text-primary"></div>
+<div class="container py-4">
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <div *ngIf="!loading && income">
+    <div class="card shadow mb-4">
+      <div class="card-header bg-success text-white">
+        <h4 class="mb-0">Total Income: {{ income.totalIncome | number:'1.2-2' }} USDT</h4>
       </div>
+    </div>
 
-      <div *ngIf="!loading && income">
-        <div class="card shadow mb-4">
-          <div class="card-header bg-success text-white">
-            <h4 class="mb-0">Total Income: {{ income.totalIncome | number:'1.2-2' }} USDT</h4>
+    <h5 class="mb-3">7 Income Streams</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card h-100 border-success">
+          <div class="card-body text-center">
+            <h6 class="text-muted">1. Winners 8X Income</h6>
+            <h3 class="text-success">{{ income.winnersIncome | number:'1.2-2' }}</h3>
+            <small class="text-muted">From your game wins</small>
           </div>
         </div>
-
-        <h5 class="mb-3">7 Income Streams</h5>
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">
-            <div class="card h-100 border-success">
-              <div class="card-body text-center">
-                <h6 class="text-muted">1. Winners 8X Income</h6>
-                <h3 class="text-success">{{ income.winnersIncome | number:'1.2-2' }}</h3>
-                <small class="text-muted">From your game wins</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100 border-primary">
-              <div class="card-body text-center">
-                <h6 class="text-muted">2. Direct Level Income</h6>
-                <h3 class="text-primary">{{ income.directLevelIncome | number:'1.2-2' }}</h3>
-                <small class="text-muted">From team deposits</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100 border-info">
-              <div class="card-body text-center">
-                <h6 class="text-muted">3. Winner Level Income</h6>
-                <h3 class="text-info">{{ income.winnerLevelIncome | number:'1.2-2' }}</h3>
-                <small class="text-muted">From team wins</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100 border-warning">
-              <div class="card-body text-center">
-                <h6 class="text-muted">4. Cashback Protection</h6>
-                <h3 class="text-warning">{{ income.cashbackIncome | number:'1.2-2' }}</h3>
-                <small class="text-muted">Daily loss recovery</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100 border-secondary">
-              <div class="card-body text-center">
-                <h6 class="text-muted">5. ROI on ROI</h6>
-                <h3 class="text-secondary">{{ income.roiOnRoiIncome | number:'1.2-2' }}</h3>
-                <small class="text-muted">From team cashback</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100 border-danger">
-              <div class="card-body text-center">
-                <h6 class="text-muted">6. Club Income</h6>
-                <h3 class="text-danger">{{ income.clubIncome | number:'1.2-2' }}</h3>
-                <small class="text-muted">From platform turnover</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 offset-md-4">
-            <div class="card h-100 border-dark">
-              <div class="card-body text-center">
-                <h6 class="text-muted">7. Lucky Draw Income</h6>
-                <h3>{{ income.luckyDrawIncome | number:'1.2-2' }}</h3>
-                <small class="text-muted">From jackpot wins</small>
-              </div>
-            </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-primary">
+          <div class="card-body text-center">
+            <h6 class="text-muted">2. Direct Level Income</h6>
+            <h3 class="text-primary">{{ income.directLevelIncome | number:'1.2-2' }}</h3>
+            <small class="text-muted">From team deposits</small>
           </div>
         </div>
-
-        <div class="card shadow">
-          <div class="card-header bg-secondary text-white">
-            <h5 class="mb-0">Recent Income History</h5>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-info">
+          <div class="card-body text-center">
+            <h6 class="text-muted">3. Winner Level Income</h6>
+            <h3 class="text-info">{{ income.winnerLevelIncome | number:'1.2-2' }}</h3>
+            <small class="text-muted">From team wins</small>
           </div>
-          <div class="card-body">
-            <div *ngIf="income.recentIncomes.length === 0" class="text-center text-muted py-4">
-              No income yet
-            </div>
-
-            <div class="table-responsive" *ngIf="income.recentIncomes.length > 0">
-              <table class="table table-hover">
-                <thead class="table-light">
-                  <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Source</th>
-                    <th>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let item of income.recentIncomes">
-                    <td>{{ item.timestamp }}</td>
-                    <td><span class="badge bg-info">{{ item.type }}</span></td>
-                    <td>{{ item.source }}</td>
-                    <td class="text-success">+{{ item.amount | number:'1.2-2' }} USDT</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-warning">
+          <div class="card-body text-center">
+            <h6 class="text-muted">4. Cashback Protection</h6>
+            <h3 class="text-warning">{{ income.cashbackIncome | number:'1.2-2' }}</h3>
+            <small class="text-muted">Daily loss recovery</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-secondary">
+          <div class="card-body text-center">
+            <h6 class="text-muted">5. ROI on ROI</h6>
+            <h3 class="text-secondary">{{ income.roiOnRoiIncome | number:'1.2-2' }}</h3>
+            <small class="text-muted">From team cashback</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-danger">
+          <div class="card-body text-center">
+            <h6 class="text-muted">6. Club Income</h6>
+            <h3 class="text-danger">{{ income.clubIncome | number:'1.2-2' }}</h3>
+            <small class="text-muted">From platform turnover</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 offset-md-4">
+        <div class="card h-100 border-dark">
+          <div class="card-body text-center">
+            <h6 class="text-muted">7. Lucky Draw Income</h6>
+            <h3>{{ income.luckyDrawIncome | number:'1.2-2' }}</h3>
+            <small class="text-muted">From jackpot wins</small>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="card shadow">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Recent Income History</h5>
+      </div>
+      <div class="card-body">
+        <div *ngIf="income.recentIncomes.length === 0" class="text-center text-muted py-4">
+          No income yet
+        </div>
+
+        <div class="table-responsive" *ngIf="income.recentIncomes.length > 0">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Source</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of income.recentIncomes">
+                <td>{{ item.timestamp }}</td>
+                <td><span class="badge bg-info">{{ item.type }}</span></td>
+                <td>{{ item.source }}</td>
+                <td class="text-success">+{{ item.amount | number:'1.2-2' }} USDT</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

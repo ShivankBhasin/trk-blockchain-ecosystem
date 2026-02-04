@@ -20,7 +20,7 @@ export class WithdrawComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private walletService: WalletService) {
     this.withdrawForm = this.fb.group({
-      amount: [100, [Validators.required, Validators.min(5), Validators.max(5000)]],
+      amount: [100, [Validators.required, Validators.min(10), Validators.max(5000)]],
       walletAddress: ['', Validators.required]
     });
   }

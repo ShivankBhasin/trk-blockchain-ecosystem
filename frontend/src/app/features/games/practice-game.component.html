@@ -1,61 +1,61 @@
 <app-navbar></app-navbar>
-    <div class="container py-4">
-      <div class="row justify-content-center">
-        <div class="col-md-8">
-          <div class="card shadow">
-            <div class="card-header bg-info text-white">
-              <h4 class="mb-0">Practice Game</h4>
-            </div>
-            <div class="card-body">
-              <div class="alert alert-info">
-                <strong>How to Play:</strong> Select a number from 1-8. If your number matches the winning number, you win 8X your bet!
-                Practice balance is non-withdrawable.
-              </div>
-
-              <div class="text-center mb-4" *ngIf="wallet">
-                <h5>Practice Balance: <span class="text-info">{{ wallet.practiceBalance | number:'1.2-2' }} USDT</span></h5>
-              </div>
-
-              <div *ngIf="result" class="alert" [class]="result.result === 'WIN' ? 'alert-success' : 'alert-danger'">
-                <h5>{{ result.message }}</h5>
-                <p class="mb-0">
-                  Your number: <strong>{{ result.selectedNumber }}</strong> |
-                  Winning number: <strong>{{ result.winningNumber }}</strong>
-                  <span *ngIf="result.result === 'WIN'"> | Payout: <strong>{{ result.payout | number:'1.2-2' }} USDT</strong></span>
-                </p>
-              </div>
-
-              <form [formGroup]="gameForm" (ngSubmit)="playGame()">
-                <div class="mb-4">
-                  <label class="form-label">Bet Amount (USDT)</label>
-                  <input type="number" class="form-control form-control-lg" formControlName="betAmount" min="1">
-                  <div class="text-danger small" *ngIf="gameForm.get('betAmount')?.touched && gameForm.get('betAmount')?.errors?.['min']">
-                    Minimum bet is 1 USDT
-                  </div>
-                </div>
-
-                <div class="mb-4">
-                  <label class="form-label">Select Your Number (1-8)</label>
-                  <div class="d-flex flex-wrap gap-2 justify-content-center">
-                    <button type="button" *ngFor="let num of numbers"
-                            class="btn btn-lg"
-                            [class]="selectedNumber === num ? 'btn-info' : 'btn-outline-info'"
-                            (click)="selectNumber(num)"
-                            style="width: 60px; height: 60px;">
-                      {{ num }}
-                    </button>
-                  </div>
-                </div>
-
-                <div class="d-grid">
-                  <button type="submit" class="btn btn-info btn-lg" [disabled]="loading || gameForm.invalid || !selectedNumber">
-                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-                    Play (Win 8X)
-                  </button>
-                </div>
-              </form>
-            </div>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-info text-white">
+          <h4 class="mb-0">Practice Game</h4>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <strong>How to Play:</strong> Select a number from 1-8. If your number matches the winning number, you win 8X your bet!
+            Practice balance is non-withdrawable.
           </div>
+
+          <div class="text-center mb-4" *ngIf="wallet">
+            <h5>Practice Balance: <span class="text-info">{{ wallet.practiceBalance | number:'1.2-2' }} USDT</span></h5>
+          </div>
+
+          <div *ngIf="result" class="alert" [class]="result.result === 'WIN' ? 'alert-success' : 'alert-danger'">
+            <h5>{{ result.message }}</h5>
+            <p class="mb-0">
+              Your number: <strong>{{ result.selectedNumber }}</strong> |
+              Winning number: <strong>{{ result.winningNumber }}</strong>
+              <span *ngIf="result.result === 'WIN'"> | Payout: <strong>{{ result.payout | number:'1.2-2' }} USDT</strong></span>
+            </p>
+          </div>
+
+          <form [formGroup]="gameForm" (ngSubmit)="playGame()">
+            <div class="mb-4">
+              <label class="form-label">Bet Amount (USDT)</label>
+              <input type="number" class="form-control form-control-lg" formControlName="betAmount" min="1">
+              <div class="text-danger small" *ngIf="gameForm.get('betAmount')?.touched && gameForm.get('betAmount')?.errors?.['min']">
+                Minimum bet is 1 USDT
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Select Your Number (1-8)</label>
+              <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <button type="button" *ngFor="let num of numbers"
+                        class="btn btn-lg"
+                        [class]="selectedNumber === num ? 'btn-info' : 'btn-outline-info'"
+                        (click)="selectNumber(num)"
+                        style="width: 60px; height: 60px;">
+                  {{ num }}
+                </button>
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-info btn-lg" [disabled]="loading || gameForm.invalid || !selectedNumber">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                Play (Win 8X)
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
+  </div>
+</div>

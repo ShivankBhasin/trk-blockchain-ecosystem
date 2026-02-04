@@ -1,64 +1,64 @@
 <app-navbar></app-navbar>
-    <div class="container py-4">
-      <div class="row justify-content-center">
-        <div class="col-md-8">
-          <div class="card shadow">
-            <div class="card-header bg-success text-white">
-              <h4 class="mb-0">Cash Game</h4>
-            </div>
-            <div class="card-body">
-              <div class="alert alert-success">
-                <strong>How to Play:</strong> Select a number from 1-8. Win 8X your bet!
-                <br><strong>Payout:</strong> 2X goes to Direct Wallet (withdrawable), 6X compounds to Cash Balance.
-              </div>
-
-              <div class="text-center mb-4" *ngIf="wallet">
-                <h5>Cash Balance: <span class="text-success">{{ wallet.cashBalance | number:'1.2-2' }} USDT</span></h5>
-                <small class="text-muted">Direct Wallet: {{ wallet.directWallet | number:'1.2-2' }} USDT</small>
-              </div>
-
-              <div *ngIf="result" class="alert" [class]="result.result === 'WIN' ? 'alert-success' : 'alert-danger'">
-                <h5>{{ result.message }}</h5>
-                <p class="mb-0">
-                  Your number: <strong>{{ result.selectedNumber }}</strong> |
-                  Winning number: <strong>{{ result.winningNumber }}</strong>
-                </p>
-                <p *ngIf="result.result === 'WIN'" class="mb-0">
-                  Direct Wallet: +{{ result.directPayout | number:'1.2-2' }} | Compounded: +{{ result.compoundPayout | number:'1.2-2' }}
-                </p>
-              </div>
-
-              <form [formGroup]="gameForm" (ngSubmit)="playGame()">
-                <div class="mb-4">
-                  <label class="form-label">Bet Amount (USDT)</label>
-                  <input type="number" class="form-control form-control-lg" formControlName="betAmount" min="1">
-                  <div class="text-danger small" *ngIf="gameForm.get('betAmount')?.touched && gameForm.get('betAmount')?.errors?.['min']">
-                    Minimum bet is 1 USDT
-                  </div>
-                </div>
-
-                <div class="mb-4">
-                  <label class="form-label">Select Your Number (1-8)</label>
-                  <div class="d-flex flex-wrap gap-2 justify-content-center">
-                    <button type="button" *ngFor="let num of numbers"
-                            class="btn btn-lg"
-                            [class]="selectedNumber === num ? 'btn-success' : 'btn-outline-success'"
-                            (click)="selectNumber(num)"
-                            style="width: 60px; height: 60px;">
-                      {{ num }}
-                    </button>
-                  </div>
-                </div>
-
-                <div class="d-grid">
-                  <button type="submit" class="btn btn-success btn-lg" [disabled]="loading || gameForm.invalid || !selectedNumber">
-                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-                    Play for Real Cash (Win 8X)
-                  </button>
-                </div>
-              </form>
-            </div>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0">Cash Game</h4>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-success">
+            <strong>How to Play:</strong> Select a number from 1-8. Win 8X your bet!
+            <br><strong>Payout:</strong> 2X goes to Direct Wallet (withdrawable), 6X compounds to Cash Balance.
           </div>
+
+          <div class="text-center mb-4" *ngIf="wallet">
+            <h5>Cash Balance: <span class="text-success">{{ wallet.cashBalance | number:'1.2-2' }} USDT</span></h5>
+            <small class="text-muted">Direct Wallet: {{ wallet.directWallet | number:'1.2-2' }} USDT</small>
+          </div>
+
+          <div *ngIf="result" class="alert" [class]="result.result === 'WIN' ? 'alert-success' : 'alert-danger'">
+            <h5>{{ result.message }}</h5>
+            <p class="mb-0">
+              Your number: <strong>{{ result.selectedNumber }}</strong> |
+              Winning number: <strong>{{ result.winningNumber }}</strong>
+            </p>
+            <p *ngIf="result.result === 'WIN'" class="mb-0">
+              Direct Wallet: +{{ result.directPayout | number:'1.2-2' }} | Compounded: +{{ result.compoundPayout | number:'1.2-2' }}
+            </p>
+          </div>
+
+          <form [formGroup]="gameForm" (ngSubmit)="playGame()">
+            <div class="mb-4">
+              <label class="form-label">Bet Amount (USDT)</label>
+              <input type="number" class="form-control form-control-lg" formControlName="betAmount" min="1">
+              <div class="text-danger small" *ngIf="gameForm.get('betAmount')?.touched && gameForm.get('betAmount')?.errors?.['min']">
+                Minimum bet is 1 USDT
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Select Your Number (1-8)</label>
+              <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <button type="button" *ngFor="let num of numbers"
+                        class="btn btn-lg"
+                        [class]="selectedNumber === num ? 'btn-success' : 'btn-outline-success'"
+                        (click)="selectNumber(num)"
+                        style="width: 60px; height: 60px;">
+                  {{ num }}
+                </button>
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-success btn-lg" [disabled]="loading || gameForm.invalid || !selectedNumber">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                Play for Real Cash (Win 8X)
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
+  </div>
+</div>
