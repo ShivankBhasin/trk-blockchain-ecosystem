@@ -1,0 +1,41 @@
+# Render Blueprint - TRK Blockchain Application
+# https://render.com/docs/blueprint-spec
+
+services:
+  # Backend - Spring Boot API (Web Service with Docker)
+  - type: web
+    name: trk-blockchain-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: oregon
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: 8080
+      # Note: CORS_ALLOWED_ORIGINS needs to be set manually after first deploy
+      # Set it to: https://trk-blockchain-frontend.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://trk-blockchain-frontend.onrender.com
+
+  # Frontend - Angular Static Site
+  - type: web
+    name: trk-blockchain-frontend
+    runtime: static
+    buildCommand: cd frontend/trk-blockchain && npm install && npm run build -- --configuration=production
+    staticPublishPath: ./frontend/trk-blockchain/dist/trk-blockchain/browser
+    region: oregon
+    plan: free
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

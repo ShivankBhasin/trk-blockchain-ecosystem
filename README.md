@@ -210,10 +210,99 @@ Access H2 Console: http://localhost:8080/h2-console
 
 ## Shell Scripts
 
-| Script | Description |
-|--------|-------------|
-| `start.sh` | Starts both backend and frontend servers |
-| `stop.sh` | Stops all running application processes |
+| Script | Description | Platform |
+|--------|-------------|----------|
+| `start.sh` | Starts both backend and frontend servers | macOS/Linux |
+| `stop.sh` | Stops all running application processes | macOS/Linux |
+| `start.bat` | Starts both backend and frontend servers | Windows |
+| `stop.bat` | Stops all running application processes | Windows |
+
+---
+
+## Deploying to Render (Cloud Hosting)
+
+### Prerequisites
+- GitHub account
+- Render account (free tier available at [render.com](https://render.com))
+
+### Step 1: Push to GitHub
+
+```bash
+# Initialize git (if not already done)
+git init
+
+# Add all files
+git add .
+
+# Commit
+git commit -m "Initial commit with Render deployment config"
+
+# Add your GitHub remote
+git remote add origin https://github.com/YOUR_USERNAME/trk-blockchain.git
+
+# Push to GitHub
+git push -u origin main
+```
+
+### Step 2: Deploy on Render
+
+1. Go to [render.com](https://render.com) and sign in
+2. Click **New** → **Blueprint**
+3. Connect your GitHub account (if not already connected)
+4. Select your `trk-blockchain` repository
+5. Render will automatically detect the `render.yaml` file
+6. Click **Apply** to create both services
+
+### Step 3: Wait for Deployment
+
+- **Frontend** (Static Site): Deploys in ~2-3 minutes
+- **Backend** (Docker): First deploy takes ~5-10 minutes (building Docker image)
+
+### Step 4: Access Your Application
+
+After deployment, your app will be available at:
+- **Frontend**: `https://trk-blockchain-frontend.onrender.com`
+- **Backend API**: `https://trk-blockchain-api.onrender.com`
+
+### Post-Deployment Configuration
+
+If your service names differ from the defaults, update these files:
+
+1. **Frontend API URL** - Edit `frontend/trk-blockchain/src/environments/environment.prod.ts`:
+   ```typescript
+   apiUrl: 'https://YOUR-BACKEND-NAME.onrender.com/api'
+   ```
+
+2. **Backend CORS** - In Render Dashboard → trk-blockchain-api → Environment:
+   ```
+   CORS_ALLOWED_ORIGINS=https://YOUR-FRONTEND-NAME.onrender.com
+   ```
+
+### Render Free Tier Limitations
+
+| Limitation | Impact |
+|------------|--------|
+| **Sleep after 15 min idle** | First request after sleep takes 30-60 seconds |
+| **512MB RAM** | JVM optimized with memory flags in Dockerfile |
+| **750 instance hours/month** | Enough for 24/7 single service |
+| **No persistent database** | Using H2 in-memory; data resets on restart |
+
+### Upgrading for Production
+
+For production use, consider:
+1. **Render Starter plan** ($7/month) - No sleep, persistent disk
+2. **External PostgreSQL** - Supabase, Neon, or PlanetScale (free tiers available)
+3. **Custom domain** - Available on paid plans
+
+---
+
+## Project Files
+
+| File | Description |
+|------|-------------|
+| `render.yaml` | Render Blueprint deployment configuration |
+| `backend/Dockerfile` | Docker image for Spring Boot (memory optimized) |
+| `backend/src/main/resources/application-prod.properties` | Production Spring Boot config |
 
 ## Additional Documentation
 
