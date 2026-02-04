@@ -2,33 +2,29 @@
 setlocal EnableDelayedExpansion
 
 REM ==========================================
-REM   TRK Blockchain Application Launcher
-REM   Windows Version
+REM   TRK Blockchain - Decentralized dApp
+REM   Frontend-Only Launcher (No Backend Required)
 REM ==========================================
 
-REM Configure JAVA_HOME - Update this path for your system
-if not defined JAVA_HOME (
-    set "JAVA_HOME=C:\Program Files\Java\jdk-21"
-)
-
 set "SCRIPT_DIR=%~dp0"
-set "BACKEND_DIR=%SCRIPT_DIR%backend"
 set "FRONTEND_DIR=%SCRIPT_DIR%frontend\trk-blockchain"
+set "CONTRACTS_DIR=%SCRIPT_DIR%contracts"
 
 echo ==========================================
-echo   TRK Blockchain Application Launcher
+echo   TRK Blockchain - Decentralized dApp
 echo ==========================================
 echo.
+echo   This is a FULLY DECENTRALIZED application.
+echo   All data is stored on Binance Smart Chain.
+echo   No backend server required!
+echo.
 
-echo [1/4] Checking prerequisites...
+REM Check for --local flag
+set "LOCAL_MODE=false"
+if "%1"=="--local" set "LOCAL_MODE=true"
+if "%1"=="-l" set "LOCAL_MODE=true"
 
-REM Check Java
-if not exist "%JAVA_HOME%\bin\java.exe" (
-    echo ERROR: Java 21 not found at %JAVA_HOME%
-    echo Please install Java 21 and set JAVA_HOME environment variable
-    echo Download from: https://adoptium.net/
-    exit /b 1
-)
+echo [1/3] Checking prerequisites...
 
 REM Check Node
 where node >nul 2>&1
@@ -38,61 +34,68 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
-echo   Java:
-"%JAVA_HOME%\bin\java" -version 2>&1 | findstr /i "version"
 echo   Node:
 node -v
+echo   npm:
+call npm -v
 echo.
 
-echo [2/4] Starting backend server...
-cd /d "%BACKEND_DIR%"
+REM Optional: Start local Hardhat node for development
+if "%LOCAL_MODE%"=="true" (
+    echo [2/3] Starting local Hardhat node...
+    cd /d "%CONTRACTS_DIR%"
 
-REM Start backend in a new window
-start "TRK-Backend" cmd /c "mvnw.cmd spring-boot:run"
+    if not exist "node_modules" (
+        echo   Installing contract dependencies...
+        call npm install --registry https://registry.npmjs.org
+    )
 
-echo   Waiting for backend to start...
-set "RETRIES=0"
-:wait_backend
-timeout /t 2 /nobreak >nul
-curl -s http://localhost:8080/api/auth/login >nul 2>&1
-if %ERRORLEVEL% equ 0 (
-    echo   Backend started on http://localhost:8080
-    goto backend_started
+    REM Disable telemetry prompt
+    set "HARDHAT_TELEMETRY_OPTOUT=1"
+    start "TRK-Hardhat" cmd /c "set HARDHAT_TELEMETRY_OPTOUT=1 && npx hardhat node"
+
+    echo   Waiting for Hardhat node...
+    timeout /t 5 /nobreak >nul
+    echo   Local blockchain running on http://localhost:8545
+    echo.
+) else (
+    echo [2/3] Skipping local blockchain ^(using BSC network^)
+    echo   To use local blockchain: start.bat --local
+    echo.
 )
-set /a RETRIES+=1
-if %RETRIES% geq 30 (
-    echo ERROR: Backend failed to start within 60 seconds
-    echo Check the backend window for errors
-    exit /b 1
-)
-goto wait_backend
 
-:backend_started
-echo.
-
-echo [3/4] Installing frontend dependencies...
+echo [3/3] Starting frontend...
 cd /d "%FRONTEND_DIR%"
-if not exist "node_modules" (
-    echo   Installing npm packages...
-    call npm install
-)
-echo.
 
-echo [4/4] Starting frontend server...
+if not exist "node_modules" (
+    echo   Installing frontend dependencies...
+    call npm install --registry https://registry.npmjs.org
+)
+
+echo   Starting Angular app...
 start "TRK-Frontend" cmd /c "npm start"
 
-timeout /t 5 /nobreak >nul
+timeout /t 10 /nobreak >nul
 echo.
 echo ==========================================
-echo   Application is running!
+echo   Decentralized App is Running!
 echo ==========================================
 echo.
 echo   Frontend: http://localhost:4200
-echo   Backend:  http://localhost:8080
-echo   H2 Console: http://localhost:8080/h2-console
 echo.
-echo   To stop, run: stop.bat
-echo   Or close the Backend and Frontend windows
+if "%LOCAL_MODE%"=="true" (
+    echo   Local Blockchain: http://localhost:8545
+    echo.
+)
+echo   How to use:
+echo   1. Open http://localhost:4200 in your browser
+echo   2. Connect your MetaMask wallet
+echo   3. Make sure you're on BSC network
+echo.
+echo   To stop: Close the TRK-Frontend window
+if "%LOCAL_MODE%"=="true" (
+    echo            Close the TRK-Hardhat window
+)
 echo.
 
 endlocal

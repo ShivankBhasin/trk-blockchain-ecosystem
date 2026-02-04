@@ -1,0 +1,104 @@
+<app-navbar></app-navbar>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">Practice Game</h4>
+          <span class="badge bg-light text-dark">On-Chain</span>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <strong>How to Play:</strong> Select a number from 1-8. Win 8X your bet!
+            <br><strong>Note:</strong> Practice balance is non-withdrawable but helps you learn the game.
+            <br><small class="text-muted">All games are recorded on BSC blockchain.</small>
+          </div>
+
+          <!-- Error Alert -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible">
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''"></button>
+          </div>
+
+          <!-- Balance Display -->
+          <div class="text-center mb-4" *ngIf="wallets">
+            <h5>Practice Balance: <span class="text-info">{{ wallets.practiceBalance | number:'1.2-2' }} USDT</span></h5>
+            <small class="text-muted">(Non-withdrawable training balance)</small>
+          </div>
+
+          <div *ngIf="loading" class="text-center py-3">
+            <div class="spinner-border text-primary"></div>
+          </div>
+
+          <!-- Game Result -->
+          <div *ngIf="result" class="alert" [class]="result.isWin ? 'alert-success' : 'alert-danger'">
+            <h5 class="mb-2">{{ result.isWin ? 'Congratulations! You Won 8X!' : 'Better luck next time!' }}</h5>
+            <p class="mb-1">
+              Your number: <strong>{{ result.selectedNumber }}</strong> |
+              Winning number: <strong>{{ result.winningNumber }}</strong>
+            </p>
+            <p *ngIf="result.isWin" class="mb-1">
+              <strong>Winnings added to Practice Balance!</strong>
+            </p>
+            <!-- <p *ngIf="txHash" class="mb-0 small">
+              <a [href]="getExplorerUrl(txHash)" target="_blank" class="text-decoration-none">
+                View on BSCScan &#x2197;
+              </a>
+            </p> -->
+          </div>
+
+          <!-- Game Form -->
+          <form [formGroup]="gameForm" (ngSubmit)="playGame()">
+            <div class="mb-4">
+              <label class="form-label">Bet Amount (USDT)</label>
+              <input type="number" class="form-control form-control-lg" formControlName="betAmount" min="1">
+              <div class="text-danger small" *ngIf="gameForm.get('betAmount')?.touched && gameForm.get('betAmount')?.errors?.['min']">
+                Minimum bet is 1 USDT
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Select Your Number (1-8)</label>
+              <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <button type="button" *ngFor="let num of numbers"
+                        class="btn btn-lg"
+                        [class]="selectedNumber === num ? 'btn-info' : 'btn-outline-info'"
+                        (click)="selectNumber(num)"
+                        [disabled]="playing"
+                        style="width: 60px; height: 60px;">
+                  {{ num }}
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-3 text-center">
+              <small class="text-muted">
+                Win probability: 12.5% (1 in 8) | Potential win: {{ (gameForm.value.betAmount * 8) | number:'1.2-2' }} USDT
+              </small>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-info btn-lg"
+                      [disabled]="playing || gameForm.invalid || !selectedNumber || !wallets || parseFloat(wallets.practiceBalance) < gameForm.value.betAmount">
+                <span *ngIf="playing" class="spinner-border spinner-border-sm me-2"></span>
+                {{ playing ? 'Confirming Transaction...' : 'Play Practice Game (Win 8X)' }}
+              </button>
+            </div>
+
+            <div class="text-center mt-3" *ngIf="wallets && parseFloat(wallets.practiceBalance) < gameForm.value.betAmount">
+              <small class="text-danger">Insufficient practice balance.</small>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Transaction Info -->
+      <div class="card mt-3 border-0 bg-light">
+        <div class="card-body small text-muted text-center">
+          <strong>Smart Contract Gaming</strong><br>
+          Every game is recorded on Binance Smart Chain. Results are provably fair and verifiable.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

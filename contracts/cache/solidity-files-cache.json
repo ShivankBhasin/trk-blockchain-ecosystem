@@ -1,0 +1,151 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/rakshit.bhasin/Desktop/blockchain/contracts/src/IERC20.sol": {
+      "lastModificationDate": 1770231108161,
+      "contentHash": "0bae6c13dd2f8314d8a9d85e76bd253e",
+      "sourceName": "src/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/Users/rakshit.bhasin/Desktop/blockchain/contracts/src/TRKLuckyDraw.sol": {
+      "lastModificationDate": 1770231108161,
+      "contentHash": "6b0fc96be09c8fcc7a45e5a15b11a0df",
+      "sourceName": "src/TRKLuckyDraw.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "TRKLuckyDraw"
+      ]
+    },
+    "/Users/rakshit.bhasin/Desktop/blockchain/contracts/src/TRKClubIncome.sol": {
+      "lastModificationDate": 1770231108161,
+      "contentHash": "dba8698b62a857af8360356f4378a6fa",
+      "sourceName": "src/TRKClubIncome.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "TRKClubIncome"
+      ]
+    },
+    "/Users/rakshit.bhasin/Desktop/blockchain/contracts/src/TRKBlockchain.sol": {
+      "lastModificationDate": 1770231108161,
+      "contentHash": "066f930e545f7ce8b64bf77cac153d07",
+      "sourceName": "src/TRKBlockchain.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "TRKBlockchain"
+      ]
+    }
+  }
+}

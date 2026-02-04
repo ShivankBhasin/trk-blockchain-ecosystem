@@ -1,0 +1,100 @@
+<app-navbar></app-navbar>
+<div class="container py-4">
+  <div class="card shadow">
+    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Transaction History</h4>
+      <span class="badge bg-light text-dark">On-Chain</span>
+    </div>
+    <div class="card-body">
+      <!-- BSCScan Link -->
+      <div class="alert alert-info d-flex justify-content-between align-items-center" *ngIf="walletState?.address">
+        <div>
+          <strong>View Full Transaction History on BSCScan</strong>
+          <br>
+          <small class="text-muted">All transactions are recorded on Binance Smart Chain</small>
+        </div>
+        <a [href]="getExplorerAddressUrl()" target="_blank" class="btn btn-primary">
+          View on BSCScan &#x2197;
+        </a>
+      </div>
+
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <p class="mt-2 text-muted">Loading from blockchain...</p>
+      </div>
+
+      <!-- Recent Games Section -->
+      <div *ngIf="!loading">
+        <h5 class="mb-3">Recent Games</h5>
+
+        <div *ngIf="gameHistory.length === 0" class="text-center py-4 text-muted">
+          No games played yet
+        </div>
+
+        <div class="table-responsive" *ngIf="gameHistory.length > 0">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Time</th>
+                <th>Type</th>
+                <th>Bet</th>
+                <th>Your Pick</th>
+                <th>Result</th>
+                <th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let game of gameHistory">
+                <td>{{ game.timestamp | date:'short' }}</td>
+                <td>
+                  <span class="badge" [class]="game.isPractice ? 'bg-info' : 'bg-success'">
+                    {{ game.isPractice ? 'Practice' : 'Cash' }}
+                  </span>
+                </td>
+                <td>{{ game.betAmount }} USDT</td>
+                <td>{{ game.selectedNumber }}</td>
+                <td>{{ game.winningNumber }}</td>
+                <td>
+                  <span [class]="game.isWin ? 'text-success fw-bold' : 'text-danger'">
+                    {{ game.isWin ? 'WIN 8X!' : 'LOSE' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- Transaction Types Info -->
+      <div class="small text-muted">
+        <h6>Transaction Types on BSCScan:</h6>
+        <div class="row">
+          <div class="col-md-6">
+            <ul class="mb-0">
+              <li><strong>Deposit:</strong> USDT transfer to contract</li>
+              <li><strong>Withdrawal:</strong> USDT transfer from contract</li>
+              <li><strong>Game Play:</strong> playGame() function call</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <ul class="mb-0">
+              <li><strong>Lucky Draw:</strong> buyTickets() function call</li>
+              <li><strong>Cashback:</strong> claimCashback() function call</li>
+              <li><strong>Referral Income:</strong> Automatic on deposits/wins</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blockchain Info -->
+  <div class="card mt-3 border-0 bg-light">
+    <div class="card-body small text-muted text-center">
+      <strong>Transparent On-Chain History</strong><br>
+      Every transaction is permanently recorded on Binance Smart Chain and can be verified by anyone.
+    </div>
+  </div>
+</div>

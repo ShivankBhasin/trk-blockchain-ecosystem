@@ -1,0 +1,177 @@
+<app-navbar></app-navbar>
+<div class="container py-4">
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2 text-muted">Loading from blockchain...</p>
+  </div>
+
+  <div *ngIf="!loading && draw">
+    <div class="row g-4 mb-4">
+      <div class="col-md-8">
+        <div class="card shadow">
+          <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Lucky Draw #{{ draw.drawId }}</h4>
+            <span class="badge bg-light text-dark">On-Chain</span>
+          </div>
+          <div class="card-body">
+            <div class="row text-center mb-4">
+              <div class="col-md-4">
+                <h2 class="text-warning mb-0">70,000</h2>
+                <small class="text-muted">USDT Prize Pool</small>
+              </div>
+              <div class="col-md-4">
+                <h2 class="text-info mb-0">{{ draw.ticketsSold }}/10,000</h2>
+                <small class="text-muted">Tickets Sold</small>
+              </div>
+              <div class="col-md-4">
+                <h2 class="text-success mb-0">{{ draw.ticketsRemaining }}</h2>
+                <small class="text-muted">Remaining</small>
+              </div>
+            </div>
+
+            <div class="progress mb-4" style="height: 25px;">
+              <div class="progress-bar bg-warning" [style.width.%]="getProgressPercent()">
+                {{ getProgressPercent() | number:'1.1-1' }}%
+              </div>
+            </div>
+
+            <!-- Wallet Balance -->
+            <div class="text-center mb-3" *ngIf="wallets">
+              <small class="text-muted">
+                Cash Balance: <strong class="text-success">{{ wallets.cashBalance | number:'1.2-2' }} USDT</strong>
+              </small>
+            </div>
+
+            <div *ngIf="success" class="alert alert-success alert-dismissible">
+              {{ success }}
+              <!-- <p *ngIf="txHash" class="mb-0 mt-2 small">
+                <a [href]="getExplorerUrl(txHash)" target="_blank" class="text-decoration-none">
+                  View Transaction on BSCScan &#x2197;
+                </a>
+              </p> -->
+              <button type="button" class="btn-close" (click)="success = ''"></button>
+            </div>
+            <div *ngIf="error" class="alert alert-danger alert-dismissible">
+              {{ error }}
+              <button type="button" class="btn-close" (click)="error = ''"></button>
+            </div>
+
+            <form [formGroup]="ticketForm" (ngSubmit)="buyTicket()" *ngIf="!draw.isComplete">
+              <div class="row align-items-end">
+                <div class="col-md-6">
+                  <label class="form-label">Number of Tickets (10 USDT each)</label>
+                  <input type="number" class="form-control" formControlName="quantity" min="1" max="100">
+                </div>
+                <div class="col-md-3">
+                  <div class="fw-bold">Total: {{ getTotalCost() | number:'1.2-2' }} USDT</div>
+                </div>
+                <div class="col-md-3">
+                  <button type="submit" class="btn btn-warning w-100" [disabled]="buying || ticketForm.invalid">
+                    <span *ngIf="buying" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ buying ? 'Confirming...' : 'Buy Tickets' }}
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <div *ngIf="draw.isComplete" class="alert alert-info text-center">
+              This draw has been completed. Winners have been selected!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow h-100">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Prize Structure (1,000 Winners)</h5>
+          </div>
+          <div class="card-body small">
+            <table class="table table-sm mb-0">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th class="text-end">Prize</th>
+                  <th class="text-end">Winners</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let prize of prizeStructure">
+                  <td>{{ prize.rank }}</td>
+                  <td class="text-end fw-bold">{{ prize.prize | number:'1.0-0' }} USDT</td>
+                  <td class="text-end">{{ prize.winners }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="text-center mt-3">
+              <span class="badge bg-success">Total: 70,000 USDT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">My Tickets ({{ userTickets }})</h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="userTickets === 0" class="text-center text-muted py-3">
+              No tickets purchased yet. Buy tickets to participate!
+            </div>
+            <div *ngIf="userTickets > 0" class="text-center py-3">
+              <h3 class="text-primary">{{ userTickets }}</h3>
+              <p class="mb-0 text-muted">Tickets in this draw</p>
+              <small class="text-muted">Win probability: {{ (userTickets / 10000 * 100) | number:'1.4-4' }}%</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Draw Info</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <span>Draw Status:</span>
+              <span class="badge" [class]="draw.isComplete ? 'bg-secondary' : 'bg-success'">
+                {{ draw.isComplete ? 'Completed' : 'Active' }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Started:</span>
+              <span>{{ draw.startTime | date:'medium' }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Ticket Price:</span>
+              <span>10 USDT</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Winning Odds:</span>
+              <span>10% (1,000 of 10,000)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blockchain Info -->
+    <div class="card mt-4 border-0 bg-light">
+      <div class="card-body small text-muted text-center">
+        <strong>Fully On-Chain Lucky Draw</strong><br>
+        All ticket purchases and prize distributions are recorded on Binance Smart Chain.
+        Winners are selected using verifiable random function (VRF) for provable fairness.
+      </div>
+    </div>
+  </div>
+
+  <!-- No Active Draw -->
+  <div *ngIf="!loading && !draw" class="text-center py-5">
+    <h4 class="text-muted">No Active Lucky Draw</h4>
+    <p>Check back later for the next draw!</p>
+  </div>
+</div>

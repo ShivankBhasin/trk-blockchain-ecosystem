@@ -1,315 +1,243 @@
-# TRK Blockchain Real Cash Game Ecosystem
+# TRK Blockchain - Fully Decentralized Gaming Platform
 
-A comprehensive blockchain-based gaming platform built with Angular 18 and Spring Boot.
+A fully decentralized blockchain-based gaming platform on Binance Smart Chain (BSC). All business logic runs on-chain through smart contracts - no centralized backend required.
 
 ## Quick Start
 
-```bash
-# Start the entire application
-./start.sh
-
-# Stop the application
-./stop.sh
-```
-
-The application will be available at:
-- **Frontend**: http://localhost:4200
-- **Backend**: http://localhost:8080
-- **H2 Console**: http://localhost:8080/h2-console
-
-## Project Structure
-
-```
-blockchain/
-├── frontend/                    # Angular 18 frontend application
-│   └── trk-blockchain/
-│       ├── src/
-│       │   ├── app/
-│       │   │   ├── core/        # Services, guards, interceptors
-│       │   │   ├── features/    # Feature modules
-│       │   │   ├── layout/      # Layout components
-│       │   │   └── models/      # TypeScript interfaces
-│       │   └── environments/
-│       └── angular.json
-├── backend/                     # Spring Boot backend application
-│   ├── src/main/java/com/trk/blockchain/
-│   │   ├── controller/          # REST API endpoints
-│   │   ├── service/             # Business logic
-│   │   ├── repository/          # Data access
-│   │   ├── entity/              # JPA entities
-│   │   ├── dto/                 # Data transfer objects
-│   │   ├── security/            # JWT authentication
-│   │   ├── config/              # Configuration
-│   │   └── exception/           # Custom exceptions
-│   └── pom.xml
-└── README.md
-```
-
-## Features
-
-### Gaming System
-- 8x multiplier game mechanics (12.5% win rate)
-- Practice mode with non-withdrawable balance
-- Cash game with real USDT
-
-### 7 Income Streams
-1. Winners 8X Income - From your game wins
-2. Direct Level Income - 15 levels (5%, 2%, 1%, 0.5%)
-3. Winner Level Income - 15 levels from team wins
-4. Cashback Protection - 0.5% daily loss recovery
-5. ROI on ROI - 15 levels from team cashback
-6. Club Income - Platform turnover percentage
-7. Lucky Draw Income - Jackpot wins
-
-### Lucky Draw System
-- 10,000 tickets per draw
-- 1,000 winners per draw
-- 70,000 USDT prize pool
-- Prize structure: 10,000 to 20 USDT
-
-### Referral System
-- 15-level deep referral structure
-- Commission on deposits and wins
-- Activation requirements
-
-### Wallet System
-- Cash Balance
-- Practice Balance
-- Direct Wallet
-- Lucky Draw Wallet
-- BEP20 (BSC) integration
-
-## Prerequisites
-
-### Frontend
+### Prerequisites
 - Node.js 18+
-- npm 9+
+- MetaMask, Trust Wallet, or any Web3 wallet
+- BNB for gas fees
+- USDT (BEP20) for gameplay
 
-### Backend
-- Java 21 (OpenJDK recommended)
-- Maven 3.8+ (included via wrapper)
-
-## Setup
-
-### Option 1: Using Shell Scripts (Recommended)
-
-```bash
-# Start both frontend and backend
-./start.sh
-
-# Stop the application
-./stop.sh
-```
-
-### Option 2: Manual Setup
-
-#### Frontend
-
+### Run Frontend Only (Recommended)
 ```bash
 cd frontend/trk-blockchain
 npm install
 npm start
 ```
 
-The frontend runs on http://localhost:4200
+Frontend: http://localhost:4200
 
-#### Backend
-
+### Deploy Smart Contracts (for development)
 ```bash
-cd backend
-export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
-./mvnw spring-boot:run
+cd contracts
+npm install
+npx hardhat compile
+npx hardhat run scripts/deploy.js --network bscTestnet
 ```
 
-The backend runs on http://localhost:8080
+## Architecture
 
-## Building for Production
+This is a **fully decentralized application (dApp)** where all business logic runs on Binance Smart Chain:
 
-### Frontend
-
-```bash
-cd frontend/trk-blockchain
-npm run build
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         USER WALLET                              │
+│           (MetaMask / Trust Wallet / WalletConnect)              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                    Web3 / ethers.js
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     ANGULAR FRONTEND                             │
+│                    (Static Web App)                              │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  Web3Service: Contract Interactions via ethers.js       │    │
+│  ├─────────────────────────────────────────────────────────┤    │
+│  │  Features: Connect | Dashboard | Games | Wallet         │    │
+│  │            Referral | Income | Lucky Draw               │    │
+│  └─────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                    Smart Contract Calls
+                      (BSC Network)
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   BINANCE SMART CHAIN                            │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  TRKBlockchain.sol - Main Game Contract                 │    │
+│  │  • User registration & referral tree                    │    │
+│  │  • 4 wallet types (Cash, Practice, Direct, LuckyDraw)   │    │
+│  │  • 8X multiplier game (12.5% win rate)                  │    │
+│  │  • 15-level commission distribution                     │    │
+│  │  • Cashback protection (0.5% daily)                     │    │
+│  ├─────────────────────────────────────────────────────────┤    │
+│  │  TRKLuckyDraw.sol - Lottery Contract                    │    │
+│  │  • 10,000 tickets per draw                              │    │
+│  │  • 1,000 winners (70,000 USDT prize pool)               │    │
+│  │  • VRF randomness for fair selection                    │    │
+│  ├─────────────────────────────────────────────────────────┤    │
+│  │  TRKClubIncome.sol - Rank & Club Rewards                │    │
+│  │  • 6 ranks (Star to Crown)                              │    │
+│  │  • 8% daily turnover distribution                       │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                              │                                   │
+│                              ▼                                   │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  USDT (BEP20) Token Contract                            │    │
+│  │  0x55d398326f99059fF775485246999027B3197955 (Mainnet)   │    │
+│  └─────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-Output in `dist/trk-blockchain/`
+## Project Structure
 
-### Backend
-
-```bash
-cd backend
-./mvnw clean package -DskipTests
-java -jar target/blockchain-1.0.0.jar
+```
+blockchain/
+├── frontend/                    # Angular 18 dApp
+│   └── trk-blockchain/
+│       ├── src/app/
+│       │   ├── core/services/
+│       │   │   └── web3.service.ts    # All blockchain interactions
+│       │   ├── features/              # UI components
+│       │   └── layout/                # Navigation & sidebar
+│       └── src/environments/          # Contract addresses
+├── contracts/                   # Solidity smart contracts
+│   ├── TRKBlockchain.sol        # Main game contract
+│   ├── TRKLuckyDraw.sol         # Lottery contract
+│   ├── TRKClubIncome.sol        # Club rewards contract
+│   ├── IERC20.sol               # USDT interface
+│   ├── scripts/deploy.js        # Deployment script
+│   └── hardhat.config.js        # Hardhat configuration
+├── backend/                     # OPTIONAL: Legacy indexer (see backend/README.md)
+└── README.md
 ```
 
-## API Endpoints
+## Features (All On-Chain)
 
-### Authentication
-- POST /api/auth/register - Register new user
-- POST /api/auth/login - User login
+### Gaming System
+- **8X Multiplier Game**: Pick 1-8, win 8X your bet (12.5% probability)
+- **Payout Split**: 2X to Direct Wallet (withdrawable) + 6X compounds to Cash Balance
+- **Practice Mode**: 100 USDT free practice balance (first 100,000 users)
+- **Cash Mode**: Real USDT gameplay
 
-### User
-- GET /api/user/me - Current user info
-- GET /api/user/dashboard - Dashboard data
+### 7 Income Streams
+| Stream | Description | Payout |
+|--------|-------------|--------|
+| 1. Winners 8X | From your game wins | 8X bet amount |
+| 2. Direct Level | From team deposits | 5%, 2%, 1%, 0.5% (15 levels) |
+| 3. Winner Level | From team wins | 5%, 2%, 1%, 0.5% (15 levels) |
+| 4. Cashback Protection | Daily loss recovery | 0.5% of losses daily |
+| 5. ROI on ROI | From team cashback | 10% (5 levels) |
+| 6. Club Income | Platform turnover share | 8% pool (rank-based) |
+| 7. Lucky Draw | Lottery winnings | Up to 10,000 USDT |
 
-### Game
-- POST /api/game/play - Play a game
-- GET /api/game/history - Game history
+### Lucky Draw System
+- 10,000 tickets at 10 USDT each
+- 1,000 winners per draw
+- Prize structure: 10,000 → 20 USDT
+- Automatic execution when sold out
 
-### Wallet
-- GET /api/wallet - Wallet balances
-- POST /api/wallet/deposit - Deposit USDT
-- POST /api/wallet/withdraw - Withdraw USDT
-- POST /api/wallet/transfer - Transfer between wallets
-- GET /api/wallet/transactions - Transaction history
+### Referral System
+- 15-level deep structure
+- Commission on deposits AND wins
+- Unlock levels by direct referrals:
+  - Level 1: 1 direct (5%)
+  - Level 2: 2 directs (2%)
+  - Levels 3-5: 3-5 directs (1%)
+  - Levels 6-10: 6-10 directs (0.5%)
+  - Levels 11-15: 10 directs + Premium (0.5%)
 
-### Referral
-- GET /api/referral/info - Referral info and stats
-- GET /api/referral/team - Team members
+### Club Income Ranks
+| Rank | Title | Volume Required | Pool Share |
+|------|-------|-----------------|------------|
+| 1 | Star | $10,000 | 10% |
+| 2 | Silver | $50,000 | 15% |
+| 3 | Gold | $250,000 | 20% |
+| 4 | Platinum | $1,000,000 | 20% |
+| 5 | Diamond | $5,000,000 | 17.5% |
+| 6 | Crown | $10,000,000 | 17.5% |
 
-### Income
-- GET /api/income/overview - Income overview
-- GET /api/income/history - Income history
+## Smart Contracts
 
-### Lucky Draw
-- GET /api/lucky-draw/current - Current draw info
-- POST /api/lucky-draw/buy - Buy tickets
-- GET /api/lucky-draw/history - Draw history
+### TRKBlockchain.sol
+Main contract handling:
+- User registration with referral
+- Deposit/withdrawal of USDT
+- Game logic (8X multiplier)
+- 15-level commission distribution
+- Cashback claims
+
+### TRKLuckyDraw.sol
+Lottery contract:
+- Ticket purchases
+- Winner selection with VRF
+- Prize distribution
+
+### TRKClubIncome.sol
+Club rewards:
+- Rank qualification
+- Daily turnover distribution
+- Volume tracking
+
+## Deployment
+
+### BSC Testnet
+```bash
+cd contracts
+cp .env.example .env
+# Add your PRIVATE_KEY to .env
+npx hardhat run scripts/deploy.js --network bscTestnet
+```
+
+### BSC Mainnet
+```bash
+npx hardhat run scripts/deploy.js --network bscMainnet
+```
+
+After deployment, update contract addresses in:
+- `frontend/trk-blockchain/src/environments/environment.ts` (testnet)
+- `frontend/trk-blockchain/src/environments/environment.prod.ts` (mainnet)
+
+## Security Features
+
+- **Self-Custody**: Users control their own wallets
+- **No Admin Keys**: Game logic is immutable
+- **Provably Fair**: VRF for random number generation
+- **Transparent**: All transactions verifiable on BSCScan
+- **No Centralized Database**: All data on blockchain
 
 ## Technology Stack
 
 ### Frontend
-- Angular 18
-- Bootstrap 5
-- RxJS
+- Angular 18 (Standalone Components)
+- ethers.js v6 (Web3 interactions)
+- Bootstrap 5 (UI)
 - TypeScript 5
 
-### Backend
-- Spring Boot 2.7.18
-- Spring Security with JWT
-- Spring Data JPA
-- H2 Database (in-memory)
-- Lombok
-- Maven
+### Smart Contracts
+- Solidity 0.8.19
+- Hardhat (Development & Deployment)
+- OpenZeppelin (Security patterns)
 
-## Security
+### Blockchain
+- Binance Smart Chain (BEP20)
+- USDT as gaming currency
 
-- JWT-based authentication
-- BCrypt password hashing
-- CORS configured for frontend
-- Protected API endpoints
+## Why Decentralized?
 
-## Database
+| Aspect | Centralized | Decentralized (TRK) |
+|--------|-------------|---------------------|
+| **Trust** | Trust the operator | Trust the code |
+| **Funds** | Held by operator | Self-custody wallet |
+| **Transparency** | Hidden logic | Open source contracts |
+| **Censorship** | Can ban users | Permissionless |
+| **Downtime** | Server dependent | Blockchain uptime |
+| **Fairness** | Hope it's fair | Provably fair (VRF) |
 
-Using H2 in-memory database for development.
+## Backend (Optional)
 
-Access H2 Console: http://localhost:8080/h2-console
-- JDBC URL: jdbc:h2:mem:trkdb
-- Username: sa
-- Password: (empty)
+The `backend/` folder contains an optional Spring Boot service that can be used as:
+- **Event Indexer**: Cache blockchain events for faster queries
+- **Analytics**: Off-chain data aggregation
+- **Legacy Support**: If migrating from centralized version
 
-## Shell Scripts
+**The backend is NOT required for the dApp to function.** All core functionality runs on-chain.
 
-| Script | Description | Platform |
-|--------|-------------|----------|
-| `start.sh` | Starts both backend and frontend servers | macOS/Linux |
-| `stop.sh` | Stops all running application processes | macOS/Linux |
-| `start.bat` | Starts both backend and frontend servers | Windows |
-| `stop.bat` | Stops all running application processes | Windows |
-
----
-
-## Deploying to Render (Cloud Hosting)
-
-### Prerequisites
-- GitHub account
-- Render account (free tier available at [render.com](https://render.com))
-
-### Step 1: Push to GitHub
-
-```bash
-# Initialize git (if not already done)
-git init
-
-# Add all files
-git add .
-
-# Commit
-git commit -m "Initial commit with Render deployment config"
-
-# Add your GitHub remote
-git remote add origin https://github.com/YOUR_USERNAME/trk-blockchain.git
-
-# Push to GitHub
-git push -u origin main
-```
-
-### Step 2: Deploy on Render
-
-1. Go to [render.com](https://render.com) and sign in
-2. Click **New** → **Blueprint**
-3. Connect your GitHub account (if not already connected)
-4. Select your `trk-blockchain` repository
-5. Render will automatically detect the `render.yaml` file
-6. Click **Apply** to create both services
-
-### Step 3: Wait for Deployment
-
-- **Frontend** (Static Site): Deploys in ~2-3 minutes
-- **Backend** (Docker): First deploy takes ~5-10 minutes (building Docker image)
-
-### Step 4: Access Your Application
-
-After deployment, your app will be available at:
-- **Frontend**: `https://trk-blockchain-frontend.onrender.com`
-- **Backend API**: `https://trk-blockchain-api.onrender.com`
-
-### Post-Deployment Configuration
-
-If your service names differ from the defaults, update these files:
-
-1. **Frontend API URL** - Edit `frontend/trk-blockchain/src/environments/environment.prod.ts`:
-   ```typescript
-   apiUrl: 'https://YOUR-BACKEND-NAME.onrender.com/api'
-   ```
-
-2. **Backend CORS** - In Render Dashboard → trk-blockchain-api → Environment:
-   ```
-   CORS_ALLOWED_ORIGINS=https://YOUR-FRONTEND-NAME.onrender.com
-   ```
-
-### Render Free Tier Limitations
-
-| Limitation | Impact |
-|------------|--------|
-| **Sleep after 15 min idle** | First request after sleep takes 30-60 seconds |
-| **512MB RAM** | JVM optimized with memory flags in Dockerfile |
-| **750 instance hours/month** | Enough for 24/7 single service |
-| **No persistent database** | Using H2 in-memory; data resets on restart |
-
-### Upgrading for Production
-
-For production use, consider:
-1. **Render Starter plan** ($7/month) - No sleep, persistent disk
-2. **External PostgreSQL** - Supabase, Neon, or PlanetScale (free tiers available)
-3. **Custom domain** - Available on paid plans
-
----
-
-## Project Files
-
-| File | Description |
-|------|-------------|
-| `render.yaml` | Render Blueprint deployment configuration |
-| `backend/Dockerfile` | Docker image for Spring Boot (memory optimized) |
-| `backend/src/main/resources/application-prod.properties` | Production Spring Boot config |
-
-## Additional Documentation
-
-| File | Description |
-|------|-------------|
-| `RUN.md` | Detailed running instructions and troubleshooting |
-| `COMMIT_GUIDE.md` | Git commit timeline for development history |
+See `backend/README.md` for details on running the optional indexer.
 
 ## License
 

@@ -1,13 +1,16 @@
 #!/bin/bash
 
-export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+# ==========================================
+#   TRK Blockchain - Decentralized App
+#   Frontend-Only Launcher (No Backend Required)
+# ==========================================
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-BACKEND_DIR="$SCRIPT_DIR/backend"
 FRONTEND_DIR="$SCRIPT_DIR/frontend/trk-blockchain"
+CONTRACTS_DIR="$SCRIPT_DIR/contracts"
 
-BACKEND_PID=""
 FRONTEND_PID=""
+HARDHAT_PID=""
 
 cleanup() {
     echo ""
@@ -15,11 +18,11 @@ cleanup() {
     if [ -n "$FRONTEND_PID" ]; then
         kill $FRONTEND_PID 2>/dev/null
     fi
-    if [ -n "$BACKEND_PID" ]; then
-        kill $BACKEND_PID 2>/dev/null
+    if [ -n "$HARDHAT_PID" ]; then
+        kill $HARDHAT_PID 2>/dev/null
     fi
-    pkill -f "spring-boot:run" 2>/dev/null
     pkill -f "ng serve" 2>/dev/null
+    pkill -f "hardhat node" 2>/dev/null
     echo "Application stopped."
     exit 0
 }
@@ -27,67 +30,91 @@ cleanup() {
 trap cleanup SIGINT SIGTERM
 
 echo "=========================================="
-echo "  TRK Blockchain Application Launcher"
+echo "  TRK Blockchain - Decentralized dApp"
 echo "=========================================="
 echo ""
+echo "  This is a FULLY DECENTRALIZED application."
+echo "  All data is stored on Binance Smart Chain."
+echo "  No backend server required!"
+echo ""
 
-echo "[1/4] Checking prerequisites..."
-if [ ! -d "$JAVA_HOME" ]; then
-    echo "ERROR: Java 21 not found at $JAVA_HOME"
-    echo "Install with: brew install openjdk@21"
-    exit 1
+# Check for --local flag to start local Hardhat node
+LOCAL_MODE=false
+if [ "$1" == "--local" ] || [ "$1" == "-l" ]; then
+    LOCAL_MODE=true
 fi
 
+echo "[1/3] Checking prerequisites..."
 if ! command -v node &> /dev/null; then
     echo "ERROR: Node.js not found"
     echo "Install with: brew install node"
     exit 1
 fi
-
-echo "  Java: $($JAVA_HOME/bin/java -version 2>&1 | head -1)"
 echo "  Node: $(node -v)"
+echo "  npm:  $(npm -v)"
 echo ""
 
-echo "[2/4] Starting backend server..."
-cd "$BACKEND_DIR"
-./mvnw spring-boot:run -q &
-BACKEND_PID=$!
+# Optional: Start local Hardhat node for development
+if [ "$LOCAL_MODE" == true ]; then
+    echo "[2/3] Starting local Hardhat node..."
+    cd "$CONTRACTS_DIR"
 
-echo "  Waiting for backend to start..."
-for i in {1..30}; do
-    if curl -s http://localhost:8080/api/auth/login > /dev/null 2>&1; then
-        echo "  Backend started on http://localhost:8080"
-        break
+    if [ ! -d "node_modules" ]; then
+        echo "  Installing contract dependencies..."
+        npm install --silent --registry https://registry.npmjs.org
     fi
-    if [ $i -eq 30 ]; then
-        echo "ERROR: Backend failed to start"
-        cleanup
-        exit 1
-    fi
-    sleep 2
-done
-echo ""
 
-echo "[3/4] Installing frontend dependencies..."
-cd "$FRONTEND_DIR"
-if [ ! -d "node_modules" ]; then
-    npm install --silent
+    # Disable telemetry prompt for background execution
+    export HARDHAT_TELEMETRY_OPTOUT=1
+    npx hardhat node &
+    HARDHAT_PID=$!
+
+    echo "  Waiting for Hardhat node..."
+    sleep 5
+    echo "  Local blockchain running on http://localhost:8545"
+    echo ""
+else
+    echo "[2/3] Skipping local blockchain (using BSC network)"
+    echo "  To use local blockchain: ./start.sh --local"
+    echo ""
 fi
-echo ""
 
-echo "[4/4] Starting frontend server..."
+echo "[3/3] Starting frontend..."
+cd "$FRONTEND_DIR"
+
+if [ ! -d "node_modules" ]; then
+    echo "  Installing frontend dependencies..."
+    npm install --silent --registry https://registry.npmjs.org
+fi
+
+echo "  Building and starting Angular app..."
 npm start &
 FRONTEND_PID=$!
 
-sleep 5
+# Wait for frontend to be ready
+echo "  Waiting for frontend to start..."
+for i in {1..30}; do
+    if curl -s http://localhost:4200 > /dev/null 2>&1; then
+        break
+    fi
+    sleep 2
+done
+
 echo ""
 echo "=========================================="
-echo "  Application is running!"
+echo "  Decentralized App is Running!"
 echo "=========================================="
 echo ""
 echo "  Frontend: http://localhost:4200"
-echo "  Backend:  http://localhost:8080"
-echo "  H2 Console: http://localhost:8080/h2-console"
+echo ""
+if [ "$LOCAL_MODE" == true ]; then
+    echo "  Local Blockchain: http://localhost:8545"
+    echo ""
+fi
+echo "  How to use:"
+echo "  1. Open http://localhost:4200 in your browser"
+echo "  2. Connect your MetaMask wallet"
+echo "  3. Make sure you're on BSC network"
 echo ""
 echo "  Press Ctrl+C to stop"
 echo ""

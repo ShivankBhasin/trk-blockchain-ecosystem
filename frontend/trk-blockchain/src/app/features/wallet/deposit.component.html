@@ -1,0 +1,118 @@
+<app-navbar></app-navbar>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">Deposit USDT</h4>
+          <span class="badge bg-light text-dark">On-Chain</span>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <strong>Minimum deposit:</strong> 10 USDT<br>
+            <strong>Network:</strong> BEP20 (BSC) only<br>
+            <strong>Activation:</strong> 10+ USDT activates your account, 100+ USDT for premium features
+          </div>
+
+          <div *ngIf="loading" class="text-center py-3">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2 text-muted">Loading from blockchain...</p>
+          </div>
+
+          <div *ngIf="success" class="alert alert-success alert-dismissible">
+            {{ success }}
+            <!-- <p *ngIf="txHash" class="mb-0 mt-2 small">
+              <a [href]="getExplorerUrl(txHash)" target="_blank" class="text-decoration-none">
+                View Transaction on BSCScan &#x2197;
+              </a>
+            </p> -->
+            <button type="button" class="btn-close" (click)="success = ''"></button>
+          </div>
+          <div *ngIf="error" class="alert alert-danger alert-dismissible">
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''"></button>
+          </div>
+
+          <div class="text-center mb-4" *ngIf="wallets && !loading">
+            <h5>Current Cash Balance: <span class="text-success">{{ wallets.cashBalance | number:'1.2-2' }} USDT</span></h5>
+            <small class="text-muted" *ngIf="userInfo">
+              Status:
+              <span class="badge" [class]="userInfo.isPremiumActivated ? 'bg-success' : userInfo.isActivated ? 'bg-primary' : 'bg-warning'">
+                {{ userInfo.isPremiumActivated ? 'Premium' : userInfo.isActivated ? 'Activated' : 'Not Activated' }}
+              </span>
+            </small>
+          </div>
+
+          <form [formGroup]="depositForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+            <div class="mb-3">
+              <label class="form-label">Amount (USDT)</label>
+              <input type="number" class="form-control form-control-lg"
+                     formControlName="amount"
+                     min="10"
+                     (change)="onAmountChange()">
+              <div class="text-danger small" *ngIf="depositForm.get('amount')?.touched && depositForm.get('amount')?.errors?.['min']">
+                Minimum deposit is 10 USDT
+              </div>
+            </div>
+
+            <!-- Activation Info -->
+            <div class="card bg-light mb-3" *ngIf="userInfo && !userInfo.isActivated">
+              <div class="card-body py-2 small">
+                <strong>Account Activation:</strong>
+                <ul class="mb-0 mt-1">
+                  <li>Deposit 10+ USDT to activate basic features</li>
+                  <li>Deposit 100+ USDT for premium activation (earn from 15 levels)</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Two-Step Process -->
+            <div class="mb-3">
+              <div class="d-flex gap-2">
+                <div class="flex-fill">
+                  <button type="button" class="btn btn-outline-primary w-100"
+                          [disabled]="approving || !needsApproval || depositForm.invalid"
+                          (click)="approveUSDT()">
+                    <span *ngIf="approving" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ approving ? 'Approving...' : needsApproval ? '1. Approve USDT' : '1. Approved ✓' }}
+                  </button>
+                </div>
+                <div class="flex-fill">
+                  <button type="submit" class="btn btn-primary w-100"
+                          [disabled]="depositing || depositForm.invalid || needsApproval">
+                    <span *ngIf="depositing" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ depositing ? 'Depositing...' : '2. Deposit' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-center small text-muted">
+              First approve USDT spending, then confirm the deposit transaction.
+            </div>
+          </form>
+
+          <hr>
+          <div class="small text-muted">
+            <p class="mb-1"><strong>How it works:</strong></p>
+            <ol class="mb-0">
+              <li>Make sure you have USDT (BEP20) in your connected wallet</li>
+              <li>Click "Approve USDT" to allow the smart contract to receive your USDT</li>
+              <li>Click "Deposit" to transfer USDT to your game balance</li>
+              <li>Your cash balance will be credited instantly on-chain</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blockchain Info -->
+      <div class="card mt-3 border-0 bg-light">
+        <div class="card-body small text-muted text-center">
+          <strong>Secure On-Chain Deposits</strong><br>
+          All deposits are processed directly through the smart contract on Binance Smart Chain.
+          Your funds remain in your control until deposited.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

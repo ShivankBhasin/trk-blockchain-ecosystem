@@ -1,0 +1,194 @@
+<app-navbar></app-navbar>
+<div class="container py-4">
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2 text-muted">Loading from blockchain...</p>
+  </div>
+
+  <div *ngIf="!loading && income">
+    <!-- Total Income Header -->
+    <div class="card shadow mb-4">
+      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Total Income: {{ income.totalIncome | number:'1.2-2' }} USDT</h4>
+        <span class="badge bg-light text-dark">On-Chain</span>
+      </div>
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-md-4">
+            <h5 class="text-success mb-0">{{ wallets?.directWallet | number:'1.2-2' }}</h5>
+            <small class="text-muted">Direct Wallet (Withdrawable)</small>
+          </div>
+          <div class="col-md-4">
+            <h5 class="text-primary mb-0">{{ wallets?.cashBalance | number:'1.2-2' }}</h5>
+            <small class="text-muted">Cash Balance (Playable)</small>
+          </div>
+          <div class="col-md-4">
+            <h5 class="text-warning mb-0">{{ wallets?.luckyDrawWallet | number:'1.2-2' }}</h5>
+            <small class="text-muted">Lucky Draw Wallet</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 Income Streams -->
+    <h5 class="mb-3">7 Income Streams</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-md-4" *ngFor="let stream of incomeStreams">
+        <div class="card h-100" [class]="'border-' + stream.color">
+          <div class="card-body text-center">
+            <div class="fs-2 mb-2">{{ stream.icon }}</div>
+            <h6 class="text-muted">{{ stream.name }}</h6>
+            <h3 [class]="'text-' + stream.color">{{ getIncomeValue(stream.key) | number:'1.2-2' }}</h3>
+            <small class="text-muted">{{ stream.description }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cashback Status -->
+    <div class="card shadow mb-4" *ngIf="userInfo">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0">Cashback Protection Status</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between mb-2">
+              <span>Total Losses:</span>
+              <strong>{{ userInfo.totalLosses | number:'1.2-2' }} USDT</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Cashback Received:</span>
+              <strong class="text-success">{{ userInfo.cashbackReceived | number:'1.2-2' }} USDT</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Remaining to Recover:</span>
+              <strong>{{ (+userInfo.totalLosses - +userInfo.cashbackReceived) | number:'1.2-2' }} USDT</strong>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between mb-2">
+              <span>Status:</span>
+              <span class="badge" [class]="+userInfo.totalLosses >= 100 ? 'bg-success' : 'bg-secondary'">
+                {{ +userInfo.totalLosses >= 100 ? 'Active' : 'Inactive (Need 100 USDT losses)' }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Daily Rate:</span>
+              <strong>0.50%</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Daily Claimable:</span>
+              <strong class="text-success">{{ (+userInfo.totalLosses * 0.005) | number:'1.2-2' }} USDT</strong>
+            </div>
+          </div>
+        </div>
+        <div class="progress mt-3" style="height: 20px;">
+          <div class="progress-bar bg-success"
+               [style.width.%]="(+userInfo.cashbackReceived / +userInfo.totalLosses * 100) || 0">
+            {{ ((+userInfo.cashbackReceived / +userInfo.totalLosses * 100) || 0) | number:'1.1-1' }}% Recovered
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Club Income Ranks -->
+    <div class="card shadow mb-4">
+      <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">Club Income Ranks</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-3">Share 8% of daily platform turnover based on your rank:</p>
+        <div class="table-responsive">
+          <table class="table table-bordered text-center mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Rank</th>
+                <th>Title</th>
+                <th>Volume Required</th>
+                <th>Pool Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><span class="badge bg-secondary">Star</span></td>
+                <td>$10,000</td>
+                <td>10%</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span class="badge bg-info">Silver</span></td>
+                <td>$50,000</td>
+                <td>15%</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><span class="badge bg-warning text-dark">Gold</span></td>
+                <td>$250,000</td>
+                <td>20%</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><span class="badge bg-primary">Platinum</span></td>
+                <td>$1,000,000</td>
+                <td>20%</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><span class="badge bg-danger">Diamond</span></td>
+                <td>$5,000,000</td>
+                <td>17.5%</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td><span class="badge bg-dark">Crown</span></td>
+                <td>$10,000,000</td>
+                <td>17.5%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <small class="text-muted mt-2 d-block">
+          Volume = Total deposits from your strong leg (50%) + other legs combined (50%)
+        </small>
+      </div>
+    </div>
+
+    <!-- Income Explanation -->
+    <div class="card shadow">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Understanding Your Income</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6>Withdrawable Income</h6>
+            <ul class="small text-muted">
+              <li><strong>Direct Wallet:</strong> 2X from game wins + referral commissions</li>
+              <li><strong>Lucky Draw Wallet:</strong> Prize winnings from lucky draws</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6>Compounding Income</h6>
+            <ul class="small text-muted">
+              <li><strong>Cash Balance:</strong> 6X from game wins + deposits</li>
+              <li><strong>Cashback:</strong> Daily 0.5% recovery goes to Cash Balance</li>
+            </ul>
+          </div>
+        </div>
+        <div class="alert alert-info mb-0 mt-3">
+          <strong>All income is tracked on-chain.</strong> View your transaction history on BSCScan for complete transparency.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blockchain Info -->
+  <div class="card mt-4 border-0 bg-light" *ngIf="!loading">
+    <div class="card-body small text-muted text-center">
+      <strong>Transparent On-Chain Income</strong><br>
+      All income distributions are executed by smart contracts and verifiable on Binance Smart Chain.
+    </div>
+  </div>
+</div>

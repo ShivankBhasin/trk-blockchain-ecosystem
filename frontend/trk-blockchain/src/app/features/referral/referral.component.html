@@ -1,0 +1,166 @@
+<app-navbar></app-navbar>
+<div class="container py-4">
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2 text-muted">Loading from blockchain...</p>
+  </div>
+
+  <div *ngIf="!loading && userInfo">
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <div class="card shadow h-100">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Your Referral Link</h5>
+            <span class="badge bg-light text-dark">On-Chain</span>
+          </div>
+          <div class="card-body">
+            <p class="text-muted">Share this link to earn referral income from 15 levels:</p>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" [value]="referralLink" readonly>
+              <button class="btn btn-primary" (click)="copyLink()">
+                {{ copied ? 'Copied!' : 'Copy' }}
+              </button>
+            </div>
+            <div class="text-center">
+              <small class="text-muted">Your wallet address is your unique referral ID</small>
+              <div class="mt-2">
+                <code class="bg-light p-2 rounded d-block text-break">{{ walletState?.address }}</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card shadow h-100">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Referral Stats</h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-4">
+                <h3 class="text-primary mb-0">{{ userInfo.directReferrals }}</h3>
+                <small class="text-muted">Direct Referrals</small>
+              </div>
+              <div class="col-4">
+                <h3 class="text-info mb-0">{{ userInfo.teamSize }}</h3>
+                <small class="text-muted">Total Team</small>
+              </div>
+              <div class="col-4">
+                <h3 class="text-success mb-0">{{ getUnlockedLevels() }}</h3>
+                <small class="text-muted">Levels Unlocked</small>
+              </div>
+            </div>
+            <hr>
+            <div class="text-center">
+              <small class="text-muted">
+                Activation Status:
+                <span class="badge ms-1" [class]="userInfo.isPremiumActivated ? 'bg-success' : userInfo.isActivated ? 'bg-primary' : 'bg-warning'">
+                  {{ userInfo.isPremiumActivated ? 'Premium (15 Levels)' : userInfo.isActivated ? 'Basic (10 Levels)' : 'Not Activated' }}
+                </span>
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Level Progress -->
+    <div class="card shadow mb-4">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Level Unlock Progress</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <span>Direct Referrals: {{ userInfo.directReferrals }} / 10</span>
+          <span>{{ Math.min(userInfo.directReferrals * 10, 100) }}%</span>
+        </div>
+        <div class="progress mb-3" style="height: 20px;">
+          <div class="progress-bar bg-info" [style.width.%]="Math.min(userInfo.directReferrals * 10, 100)">
+            {{ userInfo.directReferrals }}/10 Directs
+          </div>
+        </div>
+        <small class="text-muted">
+          Get 10 direct referrals to unlock all 10 basic levels.
+          <span *ngIf="!userInfo.isPremiumActivated">Deposit 100+ USDT for premium activation (levels 11-15).</span>
+        </small>
+      </div>
+    </div>
+
+    <!-- Commission Structure -->
+    <div class="card shadow mb-4">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0">15-Level Commission Structure</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered text-center mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Level</th>
+                <th>Deposit Commission</th>
+                <th>Winner Commission</th>
+                <th>Requirement</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of commissionStructure"
+                  [class.table-success]="isLevelUnlocked(row.level)">
+                <td><strong>{{ row.level }}</strong></td>
+                <td>{{ row.deposit }}%</td>
+                <td>{{ row.winner }}%</td>
+                <td>{{ row.requirement }}</td>
+                <td>
+                  <span class="badge"
+                        [class]="isLevelUnlocked(row.level) ? 'bg-success' : 'bg-secondary'">
+                    {{ isLevelUnlocked(row.level) ? 'Unlocked' : 'Locked' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="card shadow">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">How Referral Income Works</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="text-primary">Direct Level Income (Deposits)</h6>
+            <p class="small text-muted">
+              When anyone in your 15-level team deposits USDT, you earn a percentage based on your unlocked levels.
+              Commission is credited directly to your Direct Wallet (withdrawable).
+            </p>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-success">Winner Level Income (Wins)</h6>
+            <p class="small text-muted">
+              When anyone in your 15-level team wins a game, you earn a percentage of their winnings.
+              This compounds into your Cash Balance for more gameplay.
+            </p>
+          </div>
+        </div>
+        <hr>
+        <div class="alert alert-info mb-0">
+          <strong>All on-chain:</strong> Referral tracking and commission distribution happens automatically
+          through the smart contract. No manual claims needed - income is credited instantly when your team members
+          deposit or win.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blockchain Info -->
+  <div class="card mt-4 border-0 bg-light" *ngIf="!loading">
+    <div class="card-body small text-muted text-center">
+      <strong>Decentralized Referral System</strong><br>
+      Your referral tree is stored on-chain. All commissions are distributed automatically by the smart contract.
+    </div>
+  </div>
+</div>

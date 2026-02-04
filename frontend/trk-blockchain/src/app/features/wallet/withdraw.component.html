@@ -1,0 +1,125 @@
+<app-navbar></app-navbar>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">Withdraw USDT</h4>
+          <span class="badge bg-light text-dark">On-Chain</span>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            <strong>Limits:</strong> Min {{ MIN_WITHDRAWAL }} USDT, Max {{ MAX_WITHDRAWAL | number:'1.0-0' }} USDT/day<br>
+            <strong>Fee:</strong> {{ WITHDRAWAL_FEE }} USDT flat fee<br>
+            <strong>Network:</strong> BEP20 (BSC) - sent to your connected wallet
+          </div>
+
+          <div *ngIf="loading" class="text-center py-3">
+            <div class="spinner-border text-warning"></div>
+            <p class="mt-2 text-muted">Loading from blockchain...</p>
+          </div>
+
+          <div *ngIf="success" class="alert alert-success alert-dismissible">
+            {{ success }}
+            <!-- <p *ngIf="txHash" class="mb-0 mt-2 small">
+              <a [href]="getExplorerUrl(txHash)" target="_blank" class="text-decoration-none">
+                View Transaction on BSCScan &#x2197;
+              </a>
+            </p> -->
+            <button type="button" class="btn-close" (click)="success = ''"></button>
+          </div>
+          <div *ngIf="error" class="alert alert-danger alert-dismissible">
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''"></button>
+          </div>
+
+          <div class="text-center mb-4" *ngIf="wallets && !loading">
+            <h5>Direct Wallet: <span class="text-warning">{{ wallets.directWallet | number:'1.2-2' }} USDT</span></h5>
+            <small class="text-muted">Only Direct Wallet balance is withdrawable</small>
+          </div>
+
+          <!-- Withdrawal Destination -->
+          <div class="card bg-light mb-3" *ngIf="walletState?.address && !loading">
+            <div class="card-body py-2">
+              <small class="text-muted">Withdrawal will be sent to:</small>
+              <div class="font-monospace small text-break">{{ walletState?.address }}</div>
+            </div>
+          </div>
+
+          <form [formGroup]="withdrawForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+            <div class="mb-3">
+              <label class="form-label">Amount (USDT)</label>
+              <input type="number" class="form-control form-control-lg"
+                     formControlName="amount"
+                     [min]="MIN_WITHDRAWAL"
+                     [max]="MAX_WITHDRAWAL">
+              <div class="text-danger small" *ngIf="withdrawForm.get('amount')?.touched && withdrawForm.get('amount')?.errors?.['min']">
+                Minimum withdrawal is {{ MIN_WITHDRAWAL }} USDT
+              </div>
+              <div class="text-danger small" *ngIf="withdrawForm.get('amount')?.touched && withdrawForm.get('amount')?.errors?.['max']">
+                Maximum withdrawal is {{ MAX_WITHDRAWAL | number:'1.0-0' }} USDT per day
+              </div>
+            </div>
+
+            <!-- Fee Breakdown -->
+            <div class="mb-3" *ngIf="withdrawForm.get('amount')?.value">
+              <div class="card bg-light">
+                <div class="card-body py-2">
+                  <div class="d-flex justify-content-between">
+                    <span>Amount:</span>
+                    <span>{{ withdrawForm.get('amount')?.value | number:'1.2-2' }} USDT</span>
+                  </div>
+                  <div class="d-flex justify-content-between text-danger">
+                    <span>Fee:</span>
+                    <span>-{{ WITHDRAWAL_FEE | number:'1.2-2' }} USDT</span>
+                  </div>
+                  <hr class="my-2">
+                  <div class="d-flex justify-content-between fw-bold">
+                    <span>Deducted from wallet:</span>
+                    <span>{{ getTotalDeducted() | number:'1.2-2' }} USDT</span>
+                  </div>
+                  <div class="d-flex justify-content-between fw-bold text-success">
+                    <span>You receive:</span>
+                    <span>{{ getNetAmount() | number:'1.2-2' }} USDT</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-warning btn-lg"
+                      [disabled]="withdrawing || withdrawForm.invalid || !canWithdraw()">
+                <span *ngIf="withdrawing" class="spinner-border spinner-border-sm me-2"></span>
+                {{ withdrawing ? 'Processing Withdrawal...' : 'Withdraw to Wallet' }}
+              </button>
+            </div>
+
+            <div class="text-center mt-2" *ngIf="!canWithdraw() && wallets">
+              <small class="text-danger">Insufficient Direct Wallet balance</small>
+            </div>
+          </form>
+
+          <hr>
+          <div class="small text-muted">
+            <p class="mb-1"><strong>Withdrawal Info:</strong></p>
+            <ul class="mb-0">
+              <li>Only your Direct Wallet balance can be withdrawn</li>
+              <li>Cash Balance and Practice Balance cannot be withdrawn directly</li>
+              <li>Win games to earn 2X to your Direct Wallet (withdrawable)</li>
+              <li>USDT will be sent directly to your connected wallet address</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blockchain Info -->
+      <div class="card mt-3 border-0 bg-light">
+        <div class="card-body small text-muted text-center">
+          <strong>Instant On-Chain Withdrawals</strong><br>
+          Withdrawals are processed instantly through the smart contract.
+          USDT is sent directly to your connected wallet on BSC.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

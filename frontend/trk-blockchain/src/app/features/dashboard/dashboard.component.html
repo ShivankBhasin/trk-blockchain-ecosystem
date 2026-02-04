@@ -1,0 +1,234 @@
+<app-navbar></app-navbar>
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-md-3">
+      <app-sidebar [wallet]="wallets"></app-sidebar>
+    </div>
+    <div class="col-md-9">
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <p class="mt-2 text-muted">Loading from blockchain...</p>
+      </div>
+
+      <div *ngIf="!loading && userInfo">
+        <!-- Activation Warning -->
+        <div *ngIf="!userInfo.isActivated" class="alert alert-warning">
+          <strong>Activate Your Account!</strong> Deposit 10+ USDT to unlock all features.
+          <a routerLink="/wallet/deposit" class="alert-link">Deposit Now</a>
+        </div>
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0">
+            Welcome! <small class="text-muted">{{ shortenAddress(walletState?.address) }}</small>
+          </h4>
+          <span class="badge" [class]="userInfo.isActivated ? 'bg-success' : 'bg-warning'">
+            {{ userInfo.isActivated ? 'Activated' : 'Practice Mode' }}
+          </span>
+        </div>
+
+        <!-- Balance Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2 opacity-75">Cash Balance</h6>
+                <h3 class="card-title mb-0">{{ wallets?.cashBalance | number:'1.2-2' }}</h3>
+                <small>USDT</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-warning text-dark h-100">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2 opacity-75">Practice Balance</h6>
+                <h3 class="card-title mb-0">{{ wallets?.practiceBalance | number:'1.2-2' }}</h3>
+                <small>USDT (Non-withdrawable)</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2 opacity-75">Direct Wallet</h6>
+                <h3 class="card-title mb-0">{{ wallets?.directWallet | number:'1.2-2' }}</h3>
+                <small>USDT (Withdrawable)</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-info text-white h-100">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2 opacity-75">Team Size</h6>
+                <h3 class="card-title mb-0">{{ userInfo.teamSize }}</h3>
+                <small>Direct: {{ userInfo.directReferrals }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account & Cashback Row -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Account Status</h6>
+                <span class="badge bg-light text-dark">On-Chain</span>
+              </div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Activation Level:</span>
+                  <span class="badge" [class]="userInfo.isPremiumActivated ? 'bg-success' : userInfo.isActivated ? 'bg-primary' : 'bg-warning'">
+                    {{ userInfo.isPremiumActivated ? 'Premium (100+)' : userInfo.isActivated ? 'Basic (10+)' : 'Pending' }}
+                  </span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Total Deposited:</span>
+                  <span>{{ userInfo.totalDeposited | number:'1.2-2' }} USDT</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Total Withdrawn:</span>
+                  <span>{{ userInfo.totalWithdrawn | number:'1.2-2' }} USDT</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Direct Referrals:</span>
+                  <span>{{ userInfo.directReferrals }} / 10</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>Member Since:</span>
+                  <span>{{ userInfo.registrationTime | date:'mediumDate' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Cashback Protection</h6>
+                <button class="btn btn-sm btn-success"
+                        [disabled]="parseFloat(userInfo.totalLosses) < 100"
+                        (click)="claimCashback()">
+                  Claim Daily
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Status:</span>
+                  <span class="badge" [class]="parseFloat(userInfo.totalLosses) >= 100 ? 'bg-success' : 'bg-secondary'">
+                    {{ parseFloat(userInfo.totalLosses) >= 100 ? 'Active' : 'Inactive' }}
+                  </span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Total Losses:</span>
+                  <span>{{ userInfo.totalLosses | number:'1.2-2' }} USDT</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Daily Rate:</span>
+                  <span>0.50%</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Total Received:</span>
+                  <span class="text-success">{{ userInfo.cashbackReceived | number:'1.2-2' }} USDT</span>
+                </div>
+                <div class="progress mt-3" style="height: 10px;">
+                  <div class="progress-bar bg-success" [style.width.%]="getCashbackProgress()"></div>
+                </div>
+                <small class="text-muted">
+                  {{ parseFloat(userInfo.totalLosses) < 100 ? 'Activates at 100 USDT losses' : 'Claim 0.5% daily until fully recovered' }}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Referral Link -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">Your Referral Link</h6>
+                <code class="small">{{ referralLink }}</code>
+              </div>
+              <button class="btn btn-primary" (click)="copyReferralLink()">
+                Copy Link
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Games -->
+        <div class="card mb-4" *ngIf="gameHistory.length > 0">
+          <div class="card-header">
+            <h6 class="mb-0">Recent Games</h6>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Type</th>
+                  <th>Bet</th>
+                  <th>Your Pick</th>
+                  <th>Result</th>
+                  <th>Outcome</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let game of gameHistory">
+                  <td>{{ game.timestamp | date:'short' }}</td>
+                  <td>
+                    <span class="badge" [class]="game.isPractice ? 'bg-warning text-dark' : 'bg-success'">
+                      {{ game.isPractice ? 'Practice' : 'Cash' }}
+                    </span>
+                  </td>
+                  <td>{{ game.betAmount }} USDT</td>
+                  <td>{{ game.selectedNumber }}</td>
+                  <td>{{ game.winningNumber }}</td>
+                  <td>
+                    <span [class]="game.isWin ? 'text-success fw-bold' : 'text-danger'">
+                      {{ game.isWin ? 'WIN 8X!' : 'LOSE' }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="card text-center h-100">
+              <div class="card-body">
+                <h5 class="card-title text-primary">Play Practice Game</h5>
+                <p class="card-text">Risk-free gameplay with your practice balance</p>
+                <a routerLink="/games/practice" class="btn btn-outline-primary">Play Now</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card text-center h-100">
+              <div class="card-body">
+                <h5 class="card-title text-success">Play Cash Game</h5>
+                <p class="card-text">Win 8X your bet with real USDT</p>
+                <a routerLink="/games/cash" class="btn btn-outline-success"
+                   [class.disabled]="!userInfo.isActivated">
+                  {{ userInfo.isActivated ? 'Play Now' : 'Activate First' }}
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card text-center h-100">
+              <div class="card-body">
+                <h5 class="card-title text-warning">Lucky Draw</h5>
+                <p class="card-text">Win up to 10,000 USDT with 10 USDT ticket</p>
+                <a routerLink="/lucky-draw" class="btn btn-outline-warning">Buy Ticket</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
