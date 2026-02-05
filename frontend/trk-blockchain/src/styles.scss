@@ -1,25 +1,803 @@
 @import 'bootstrap/scss/bootstrap';
 
+/* ================================
+   GLOBAL THEME
+================================ */
+
 body {
-  background-color: #f8f9fa;
+  background: radial-gradient(circle at top, #141414 0%, #0a0a0a 45%, #000 100%);
+  color: #ffffff;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.card {
+/* ================================
+   TYPOGRAPHY
+================================ */
+
+h1,h2,h3,h4,h5,h6 {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+p {
+  color: #cfcfcf;
+}
+
+small {
+  color: #9aa0a6;
+}
+
+/* ================================
+   NAVBAR
+================================ */
+
+.navbar {
+  background: linear-gradient(180deg, #0a0a0a, #000000);
+  border-bottom: 1px solid #1f1f1f;
+  box-shadow: none;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.nav-link {
+  color: #cfcfcf !important;
+  margin-right: 1rem;
+}
+
+.nav-link:hover {
+  color: #f5c518 !important;
+}
+
+.nav-link.active {
+  background: #f5c518;
+  color: #000 !important;
+  border-radius: 6px;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+/* ================================
+   DROPDOWNS
+================================ */
+
+.dropdown-menu {
+  background: #0f0f0f;
+  border: 1px solid #1f1f1f;
   border-radius: 10px;
 }
 
+.dropdown-item {
+  color: #e5e5e5;
+}
+
+.dropdown-item:hover {
+  background: #f5c518;
+  color: #000;
+}
+
+/* ================================
+   CARDS
+================================ */
+
+.card {
+  background: linear-gradient(180deg, #121212, #0c0c0c);
+  border: 1px solid #1f1f1f;
+  border-radius: 16px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.6);
+}
+
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid #1f1f1f;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+
 .btn {
-  border-radius: 8px;
+  border-radius: 10px;
+  font-weight: 500;
 }
 
-.navbar {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.btn-primary {
+  background: #f5c518;
+  border: none;
+  color: #000;
 }
 
-.table th {
-  font-weight: 600;
+.btn-primary:hover {
+  background: #ffd84d;
+  color: #000;
 }
+
+.btn-success {
+  background: #00c853;
+  border: none;
+}
+
+.btn-success:hover {
+  background: #00e676;
+}
+
+.btn-outline-primary {
+  border-color: #f5c518;
+  color: #f5c518;
+}
+
+.btn-outline-primary:hover {
+  background: #f5c518;
+  color: #000;
+}
+
+/* ================================
+   BADGES
+================================ */
 
 .badge {
   font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.bg-success {
+  background: #00c853 !important;
+}
+
+.bg-warning {
+  background: #f5c518 !important;
+  color: #000 !important;
+}
+
+.bg-primary {
+  background: #1a73e8 !important;
+}
+
+/* ================================
+   INPUTS
+================================ */
+
+.form-control {
+  background: #0f0f0f;
+  border: 1px solid #1f1f1f;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.form-control:focus {
+  background: #0f0f0f;
+  border-color: #f5c518;
+  box-shadow: none;
+  color: #fff;
+}
+
+::placeholder {
+  color: #888;
+}
+
+/* ================================
+   TABLES
+================================ */
+
+.table {
+  color: #fff;
+}
+
+.table thead th {
+  border-bottom: 1px solid #2a2a2a;
+  color: #f5c518;
+  font-weight: 600;
+}
+
+.table td {
+  border-top: 1px solid #1f1f1f;
+}
+
+/* ================================
+   SECTIONS / HEADERS
+================================ */
+
+.section-title {
+  color: #f5c518;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+/* ================================
+   LINKS
+================================ */
+
+a {
+  color: #f5c518;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #ffd84d;
+}
+
+/* ================================
+   SCROLLBAR
+================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f5c518;
+}
+
+/* ================================
+   ANIMATIONS
+================================ */
+
+.card,
+.btn,
+.form-control {
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 768px) {
+  .navbar-nav {
+    text-align: center;
+  }
+}
+
+.wallet-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.wallet-modal{
+  background:#1a1d22;
+  color:white;
+  width:700px;
+  max-width:95%;
+  border-radius:12px;
+  padding:25px;
+}
+
+.wallet-item{
+  padding:12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.wallet-item:hover{
+  background:#2a2f36;
+}
+
+/* Backdrop fade */
+.wallet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* Modal pop animation */
+.wallet-modal {
+  background: #141414;
+  color: #fff;
+  border-radius: 14px;
+  width: 520px;
+  max-width: 95%;
+  padding: 24px;
+  transform: scale(0.85);
+  opacity: 0;
+  animation: popIn 0.25s ease-out forwards;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes popIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.wallet-item {
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 6px;
+  transition: all 0.25s ease;
+}
+
+.wallet-item:hover {
+  background: linear-gradient(135deg,#f7b500,#ffcc00);
+  color: #000;
+  transform: translateX(4px);
+  box-shadow: 0 0 15px rgba(255,200,0,0.6);
+}
+.wallet-modal .border-end {
+  border-color: rgba(255,255,255,0.08) !important;
+}
+.wallet-modal h5 {
+  font-weight: 600;
+}
+
+.wallet-modal .btn-close {
+  filter: invert(1);
+  opacity: 0.7;
+}
+
+.wallet-modal .btn-close:hover {
+  opacity: 1;
+}
+.bg-black{
+  background:#000 !important;
+}
+.page-container{
+  padding-top:120px;
+  max-width:1100px;
+  margin:auto;
+}
+
+.page-title{
+  text-align:center;
+  color:#f5c518;
+  margin-bottom:40px;
+  font-weight:700;
+}
+
+.warning-card{
+  border:1px solid #f5c518;
+}
+/* ============================
+   MAIN NAVBAR SPACING FIX
+============================ */
+
+.main-navbar{
+  width:100%;
+  background:#000;
+  border-bottom:1px solid #1f1f1f;
+}
+
+.navbar-container{
+  max-width:1200px;
+  margin:auto;
+  height:72px;
+  padding:0 24px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.nav-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+  color:#fff;
+}
+
+.nav-center{
+  display:flex;
+  align-items:center;
+  gap:32px;
+}
+
+.nav-center a{
+  color:#cfcfcf;
+  text-decoration:none;
+  font-weight:500;
+}
+
+.nav-center a:hover{
+  color:#f5c518;
+}
+
+.nav-center a.active{
+  color:#f5c518;
+}
+
+.nav-right{
+  display:flex;
+  align-items:center;
+}
+.page-wrapper {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #111 0%, #000 60%);
+  padding: 120px 16px 80px;
+  color: white;
+}
+
+.page-title {
+  text-align: center;
+  color: #ffc107;
+  font-size: 40px;
+  font-weight: 800;
+  margin-bottom: 60px;
+}
+
+.glass-card h3 {
+  font-size: 24px;
+  margin-bottom: 18px;
+}
+
+.glass-card p {
+  color: #bbb;
+  line-height: 1.6;
+}
+
+.two-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.feature-item h4 {
+  color: #ffc107;
+  margin-bottom: 6px;
+}
+
+ul.clean-list {
+  padding-left: 0;
+  list-style: none;
+}
+
+ul.clean-list li {
+  margin-bottom: 10px;
+  color: #ddd;
+}
+
+.glass-card{
+  max-width:1100px;
+  margin:0 auto 24px;
+  padding:24px;
+  background:rgba(15,15,15,0.75);
+  border-radius:16px;
+  border:1px solid #1f1f1f;
+}
+
+.faq-item {
+  padding: 20px;
+}
+
+.faq-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.faq-body {
+  margin-top: 14px;
+  color: #bdbdbd;
+  line-height: 1.6;
+}
+
+.arrow {
+  color: #ffc107;
+  transition: transform 0.25s ease;
+  font-size: 18px;
+}
+
+.arrow.open {
+  transform: rotate(180deg);
+}
+/* ============================
+   PRE DASHBOARD REGISTER
+============================ */
+
+.register-wrapper{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.register-card{
+  width:420px;
+  background:#0c0c0c;
+  border-radius:18px;
+  padding:36px;
+  border:1px solid #1f1f1f;
+}
+
+.register-card h2{
+  color:#fff;
+  margin-bottom:6px;
+}
+
+.subtitle{
+  color:#aaa;
+  margin-bottom:14px;
+}
+
+.status-pill{
+  display:inline-block;
+  background:#0f2f1b;
+  color:#22c55e;
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:13px;
+  margin-bottom:20px;
+}
+
+.register-card label{
+  display:block;
+  margin-bottom:6px;
+  font-size:13px;
+  color:#aaa;
+}
+
+.register-card input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  background:#111;
+  border:1px solid #222;
+  color:white;
+  margin-bottom:10px;
+}
+
+.register-card input:focus{
+  outline:none;
+  border-color:#f5c518;
+}
+
+.register-card button{
+  width:100%;
+  background:#f5c518;
+  color:black;
+  border:none;
+  padding:12px;
+  border-radius:10px;
+  font-weight:600;
+  margin-top:10px;
+}
+
+.register-card button:hover{
+  background:#ffd84d;
+}
+
+.error{
+  color:#ff4d4d;
+  font-size:13px;
+  margin-bottom:6px;
+}
+
+.bonus-text{
+  margin-top:14px;
+  color:#f5c518;
+  font-size:13px;
+}
+
+/* =========================================================
+   DARK UI VISIBILITY BOOST (SAFE OVERRIDES ONLY)
+========================================================= */
+
+/* Global dim text upgrade */
+.text-muted,
+.muted,
+small,
+.subtext,
+.meta,
+.label,
+.info-text {
+  color: #ffffff !important;
+  opacity: 0.85;
+}
+
+/* -------------------------------------------------
+ DASHBOARD
+------------------------------------------------- */
+
+.dashboard .non-withdrawable,
+.dashboard .withdrawable,
+.dashboard .account-status,
+.dashboard .cashback-protection,
+.dashboard .card small,
+.dashboard .card span {
+  color: #ffffff !important;
+}
+
+/* -------------------------------------------------
+ PRACTICE GAME
+------------------------------------------------- */
+
+.practice-game p,
+.practice-game span,
+.practice-game small,
+.practice-game label,
+.practice-game .meta,
+.practice-game .probability,
+.practice-game .potential,
+.practice-game .note,
+.practice-game .subtext {
+  color: #ffffff !important;
+}
+
+/* -------------------------------------------------
+ CASH GAME
+------------------------------------------------- */
+
+.cash-game p,
+.cash-game span,
+.cash-game small,
+.cash-game label,
+.cash-game .meta,
+.cash-game .probability,
+.cash-game .potential,
+.cash-game .note,
+.cash-game .subtext {
+  color: #ffffff !important;
+}
+
+/* -------------------------------------------------
+ GAME RESULT TEXT
+------------------------------------------------- */
+
+.game-result,
+.game-result span,
+.game-result strong {
+  color: #ffffff !important;
+}
+
+/* -------------------------------------------------
+ RED RESULT (slightly brighter)
+------------------------------------------------- */
+
+.alert-danger,
+.result-loss {
+  background: #2a0000 !important;
+  border-color: #ff5c5c !important;
+}
+
+.alert-danger span,
+.alert-danger strong {
+  color: #ffffff !important;
+}
+
+/* -------------------------------------------------
+ GREEN RESULT (slightly brighter)
+------------------------------------------------- */
+
+.alert-success,
+.result-win {
+  background: #0b3a22 !important;
+  border-color: #28e07a !important;
+}
+
+.alert-success span,
+.alert-success strong {
+  color: #dfffe9 !important;
+}
+
+/* -------------------------------------------------
+ REFERRAL PAGE
+------------------------------------------------- */
+
+.referral-page p,
+.referral-page span,
+.referral-page small,
+.referral-page td,
+.referral-page th {
+  color: #ffffff !important;
+}
+
+/* -------------------------------------------------
+ INCOME PAGE CARDS
+------------------------------------------------- */
+
+.income-page p,
+.income-page span,
+.income-page small,
+.income-page .meta,
+.income-page .subtext {
+  color: #ffffff !important;
+}
+
+/* -------------------------------------------------
+ LUCKY DRAW PAGE
+------------------------------------------------- */
+
+.lucky-draw p,
+.lucky-draw span,
+.lucky-draw small,
+.lucky-draw .meta,
+.lucky-draw .subtext {
+  color: #ffffff !important;
+}
+
+/* -------------------------------------------------
+ NUMBER BUTTON TEXT
+------------------------------------------------- */
+
+.practice-game button,
+.cash-game button {
+  color: #ffffff !important;
+}
+
+/* =========================================================
+   TARGETED VISIBILITY FIX (ONLY HIGHLIGHTED TEXT)
+========================================================= */
+
+/* -------- PRACTICE GAME -------- */
+
+.practice-game .balance-label,
+.practice-game .balance-subtext,
+.practice-game .bet-label,
+.practice-game .number-label,
+.practice-game .probability-text {
+  color: #ffffff !important;
+}
+
+/* -------- PRACTICE GAME RESULT BOX -------- */
+
+.practice-game .result-box p,
+.practice-game .result-box span {
+  color: #e8ffe8 !important;
+}
+
+/* Slightly darker green success text */
+.practice-game .result-box strong {
+  color: #bfffd3 !important;
+}
+
+/* -------- CASH GAME -------- */
+
+.cash-game .balance-label,
+.cash-game .wallet-label {
+  color: #ffffff !important;
+}
+
+/* -------- LUCKY DRAW INPUT LABEL -------- */
+
+.lucky-draw .ticket-label {
+  color: #ffffff !important;
+}
+
+/* -------- LUCKY DRAW TOTAL TEXT -------- */
+
+.lucky-draw .total-amount {
+  color: #ffffff !important;
+}
+
+/* -------- DRAW INFO LEFT SIDE LABELS -------- */
+
+.lucky-draw .draw-info-label {
+  color: #ffffff !important;
 }

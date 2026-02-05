@@ -1,4 +1,117 @@
-<app-navbar></app-navbar>
+<div class="container py-4">
+
+  <!-- HEADER -->
+  <h3 class="text-warning mb-4 fw-bold">User Dashboard</h3>
+
+  <!-- REGISTER CARD (Before Registration) -->
+  <div *ngIf="!userInfo?.isRegistered" class="d-flex justify-content-center">
+    <div class="card bg-dark text-white shadow-lg p-4 col-md-6">
+
+      <h4 class="fw-bold mb-2">Join TRK Game</h4>
+      <p class="text-secondary">Register to unlock your referral code and rewards.</p>
+
+      <span class="badge bg-success mb-3">Wallet Connected</span>
+
+      <label class="text-uppercase small">Referral Address (Required)</label>
+
+      <!-- <input
+        type="text"
+        class="form-control bg-black text-white border-secondary mb-2"
+        placeholder="Use TRK code (e.g., TRK12345) or wallet address"
+        [(ngModel)]="referrer"
+      />
+
+      <small class="text-danger" *ngIf="!referrer">
+        Referral address is required
+      </small>
+
+      <button
+        class="btn btn-warning mt-3"
+        (click)="register()"
+        [disabled]="registering"
+      >
+        {{ registering ? 'Registering...' : 'Register & Claim 100 USDT Bonus' }}
+      </button> -->
+
+      <small class="text-warning mt-3 d-block">
+        🎁 You get: $100 USDT Bonus (Practice Account)
+      </small>
+
+      <small class="text-secondary">
+        *Practice account enabled by default. Deposit $10 to activate real cash game.
+      </small>
+
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD AFTER REGISTER -->
+  <div *ngIf="userInfo?.isRegistered">
+
+    <!-- BALANCE ROW -->
+    <div class="row g-3 mb-4">
+
+      <div class="col-md-3">
+        <div class="card bg-primary text-white p-3">
+          <h6>Cash Balance</h6>
+          <h3>{{ wallets?.cashBalance }} USDT</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card bg-warning text-dark p-3">
+          <h6>Practice Balance</h6>
+          <h3>{{ wallets?.practiceBalance }} USDT</h3>
+          <small>Non-withdrawable</small>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card bg-success text-white p-3">
+          <h6>Direct Wallet</h6>
+          <h3>{{ wallets?.directWallet }} USDT</h3>
+          <small>Withdrawable</small>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card bg-info text-white p-3">
+          <h6>Team Size</h6>
+          <h3>{{ userInfo?.teamSize }}</h3>
+          <small>Direct: {{ userInfo?.directReferrals }}</small>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ACCOUNT STATUS -->
+    <div class="row g-3">
+
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5>Account Status</h5>
+          <p>Activation Level: Premium (100+)</p>
+          <p>Total Deposited: {{ userInfo?.totalDeposited }} USDT</p>
+          <p>Total Withdrawn: {{ userInfo?.totalWithdrawn }} USDT</p>
+          <p>Member Since: {{ userInfo?.registrationTime | date }}</p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5>Cashback Protection</h5>
+          <p>Status: Inactive</p>
+          <p>Total Losses: 0 USDT</p>
+          <p>Total Received: 0 USDT</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- <app-navbar></app-navbar>
 <div class="container-fluid py-4">
   <div class="row">
     <div class="col-md-3">
@@ -11,13 +124,11 @@
       </div>
 
       <div *ngIf="!loading && userInfo">
-        <!-- Activation Warning -->
         <div *ngIf="!userInfo.isActivated" class="alert alert-warning">
           <strong>Activate Your Account!</strong> Deposit 10+ USDT to unlock all features.
           <a routerLink="/wallet/deposit" class="alert-link">Deposit Now</a>
         </div>
 
-        <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h4 class="mb-0">
             Welcome! <small class="text-muted">{{ shortenAddress(walletState?.address) }}</small>
@@ -27,7 +138,6 @@
           </span>
         </div>
 
-        <!-- Balance Cards -->
         <div class="row g-3 mb-4">
           <div class="col-md-3">
             <div class="card bg-primary text-white h-100">
@@ -67,7 +177,6 @@
           </div>
         </div>
 
-        <!-- Account & Cashback Row -->
         <div class="row g-3 mb-4">
           <div class="col-md-6">
             <div class="card h-100">
@@ -141,7 +250,6 @@
           </div>
         </div>
 
-        <!-- Referral Link -->
         <div class="card mb-4">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
@@ -156,7 +264,6 @@
           </div>
         </div>
 
-        <!-- Recent Games -->
         <div class="card mb-4" *ngIf="gameHistory.length > 0">
           <div class="card-header">
             <h6 class="mb-0">Recent Games</h6>
@@ -195,7 +302,6 @@
           </div>
         </div>
 
-        <!-- Quick Actions -->
         <div class="row g-3">
           <div class="col-md-4">
             <div class="card text-center h-100">
@@ -231,4 +337,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->

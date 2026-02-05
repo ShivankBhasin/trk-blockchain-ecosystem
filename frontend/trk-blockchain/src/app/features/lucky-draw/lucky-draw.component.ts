@@ -68,29 +68,60 @@ export class LuckyDrawComponent implements OnInit {
     this.loading = false;
   }
 
-  async buyTicket() {
+ async buyTicket() {
 
-    if (this.ticketForm.invalid) return;
+  if (this.ticketForm.invalid) return;
 
-    this.buying = true;
-    this.success = '';
-    this.error = '';
-
-    const quantity = this.ticketForm.value.quantity;
-
-    // Fake purchase
-    await this.web3Service.buyLuckyDrawTickets(quantity);
-
-    this.userTickets += quantity;
-    this.draw!.ticketsSold += quantity;
-    this.draw!.ticketsRemaining -= quantity;
-
-    this.success = `Successfully purchased ${quantity} ticket(s)!`;
-
-    this.wallets = await this.web3Service.getUserWallets();
-
-    this.buying = false;
+  // 🔒 Block if no balance
+  if (!this.wallets || Number(this.wallets.luckyDrawWallet) <= 0) {
+    this.error = 'Insufficient Lucky Draw balance';
+    return;
   }
+
+  this.buying = true;
+  this.success = '';
+  this.error = '';
+
+  const quantity = this.ticketForm.value.quantity;
+
+  // Fake blockchain delay
+  await new Promise(res => setTimeout(res, 2000));
+
+  // Fake success
+  await this.web3Service.buyLuckyDrawTickets(quantity);
+
+  this.userTickets += quantity;
+  this.draw!.ticketsSold += quantity;
+  this.draw!.ticketsRemaining -= quantity;
+
+  this.success = `Successfully purchased ${quantity} ticket(s)!`;
+
+  this.buying = false;
+}
+
+  // async buyTicket() {
+
+  //   if (this.ticketForm.invalid) return;
+
+  //   this.buying = true;
+  //   this.success = '';
+  //   this.error = '';
+
+  //   const quantity = this.ticketForm.value.quantity;
+
+  //   // Fake purchase
+  //   await this.web3Service.buyLuckyDrawTickets(quantity);
+
+  //   this.userTickets += quantity;
+  //   this.draw!.ticketsSold += quantity;
+  //   this.draw!.ticketsRemaining -= quantity;
+
+  //   this.success = `Successfully purchased ${quantity} ticket(s)!`;
+
+  //   this.wallets = await this.web3Service.getUserWallets();
+
+  //   this.buying = false;
+  // }
 
   getTotalCost(): number {
     return this.ticketForm.value.quantity * 10;

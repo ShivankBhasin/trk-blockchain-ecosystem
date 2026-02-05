@@ -1,4 +1,6 @@
-<app-navbar></app-navbar>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
 <div class="container py-4">
   <div *ngIf="loading" class="text-center py-5">
     <div class="spinner-border text-primary"></div>
@@ -173,5 +175,8 @@
   <div *ngIf="!loading && !draw" class="text-center py-5">
     <h4 class="text-muted">No Active Lucky Draw</h4>
     <p>Check back later for the next draw!</p>
+  </div>
+</div>
+    </div>
   </div>
 </div>

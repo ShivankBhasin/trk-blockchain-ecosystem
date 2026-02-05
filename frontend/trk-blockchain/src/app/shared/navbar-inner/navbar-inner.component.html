@@ -1,0 +1,25 @@
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container-fluid px-4">
+
+    <div class="d-flex align-items-center gap-2">
+      <img src="assets/logo.png" width="42">
+      <strong class="text-white">TRK Blockchain</strong>
+    </div>
+
+    <div class="d-flex align-items-center gap-4">
+
+      <a routerLink="/" routerLinkActive="active" class="nav-link">Home</a>
+      <a routerLink="/about" routerLinkActive="active" class="nav-link">About</a>
+      <a routerLink="/how-it-works" routerLinkActive="active" class="nav-link">How It Works</a>
+      <a routerLink="/faq" routerLinkActive="active" class="nav-link">FAQ</a>
+      <a routerLink="/terms" routerLinkActive="active" class="nav-link">Terms</a>
+
+      <button class="btn btn-warning fw-bold"
+              (click)="openWallet()">
+        Connect Wallet
+      </button>
+
+    </div>
+
+  </div>
+</nav>

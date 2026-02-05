@@ -1,0 +1,44 @@
+<nav class="main-navbar">
+  <div class="navbar-container">
+
+    <!-- LEFT -->
+    <div class="nav-left">
+      <img src="assets/logo.png" width="34">
+      <span>TRK Blockchain</span>
+    </div>
+
+    <!-- CENTER -->
+    <div class="nav-center">
+      <a routerLink="/connect"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact:true}">
+        Home
+      </a>
+
+      <a routerLink="/about" routerLinkActive="active">
+        About
+      </a>
+
+      <a routerLink="/how-it-works" routerLinkActive="active">
+        How It Works
+      </a>
+
+      <a routerLink="/faq" routerLinkActive="active">
+        FAQ
+      </a>
+
+      <a routerLink="/terms" routerLinkActive="active">
+        Terms
+      </a>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="nav-right">
+      <button class="btn btn-warning"
+              (click)="openWallet()">
+        Connect Wallet
+      </button>
+    </div>
+
+  </div>
+</nav>

@@ -1,4 +1,87 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<!-- <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+
+    <a class="navbar-brand fw-bold" routerLink="/dashboard">
+      <span class="me-2">&#x26d3;</span> TRK Blockchain
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+
+      <ul class="navbar-nav me-auto">
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link" routerLink="/games">
+            Games
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/referral">Referral</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/income">Income</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/lucky-draw">Lucky Draw</a>
+        </li>
+
+      </ul>
+
+      <div class="d-flex align-items-center me-3" *ngIf="wallets">
+        <span class="badge bg-success me-2">
+          Cash: {{ wallets.cashBalance | number:'1.2-2' }} USDT
+        </span>
+
+        <span class="badge bg-warning text-dark me-2">
+          Practice: {{ wallets.practiceBalance | number:'1.2-2' }}
+        </span>
+
+        <button class="btn btn-sm btn-outline-light" (click)="refreshBalances()">
+          &#x21bb;
+        </button>
+      </div>
+
+      <div class="dropdown" *ngIf="walletState?.isConnected">
+
+        <button class="btn btn-dark dropdown-toggle"
+                data-bs-toggle="dropdown">
+          {{ shortenAddress(walletState?.address) }}
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+
+          <li>
+            <button class="dropdown-item" (click)="copyAddress()">
+              Copy Address
+            </button>
+          </li> -->
+
+          <!-- <li>
+            <button class="dropdown-item text-danger"
+                    (click)="disconnect()">
+              Disconnect
+            </button>
+          </li>
+
+        </ul>
+
+      </div>
+
+    </div>
+  </div>
+</nav> -->
+
+<!-- <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container-fluid">
     <a class="navbar-brand fw-bold" routerLink="/dashboard">
       <span class="me-2">&#x26d3;</span> TRK Blockchain
@@ -41,7 +124,6 @@
         </li>
       </ul>
 
-      <!-- Wallet Balances -->
       <div class="d-flex align-items-center me-3" *ngIf="wallets">
         <span class="badge bg-success me-2" title="Cash Balance">
           Cash: {{ wallets.cashBalance | number:'1.2-2' }} USDT
@@ -54,7 +136,6 @@
         </button>
       </div>
 
-      <!-- Wallet Info -->
       <ul class="navbar-nav">
         <li class="nav-item dropdown" *ngIf="walletState?.isConnected">
           <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
@@ -99,4 +180,49 @@
       </ul>
     </div>
   </div>
+</nav> --> 
+
+<nav class="navbar">
+
+  <!-- LOGO -->
+  <div class="logo" routerLink="/">
+    TRK
+  </div>
+
+  <!-- LINKS -->
+  <div class="nav-links">
+
+    <a routerLink="/">Home</a>
+
+    <a routerLink="/dashboard">Dashboard</a>
+
+    <div class="dropdown">
+      <span>Game ▾</span>
+      <div class="dropdown-menu">
+        <a routerLink="/practice-game">Practice Game</a>
+        <a routerLink="/cash-game">Cash Game</a>
+      </div>
+    </div>
+
+    <a routerLink="/referral">Referral</a>
+
+    <a routerLink="/income">Income</a>
+
+    <a routerLink="/lucky-draw">Lucky Draw</a>
+
+    <a routerLink="/about">About</a>
+
+    <a routerLink="/how-it-works">How It Works</a>
+
+    <a routerLink="/faq">FAQ</a>
+
+    <a routerLink="/terms">Terms</a>
+
+  </div>
+
+  <!-- WALLET -->
+  <div class="wallet-box" *ngIf="walletState?.isConnected">
+    {{ shortenAddress(walletState?.address) }}
+  </div>
+
 </nav>

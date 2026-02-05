@@ -1,150 +1,212 @@
-<div class="container">
-  <div class="row justify-content-center align-items-center min-vh-100">
-    <div class="col-md-6 col-lg-5">
-      <div class="card shadow-lg">
-        <div class="card-body p-5">
-          <!-- Logo/Header -->
-          <div class="text-center mb-4">
-            <h1 class="display-6 fw-bold text-primary">TRK Blockchain</h1>
-            <p class="text-muted">Real Cash Game Ecosystem</p>
-            <span class="badge bg-warning text-dark">Powered by BSC</span>
-          </div>
+<!-- ================= HERO SECTION ================= -->
+<div class="container-fluid min-vh-100 d-flex flex-column text-white bg-black pt-5">
 
-          <!-- Error Alert -->
-          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
-            {{ error }}
-            <button type="button" class="btn-close" (click)="error = ''"></button>
-          </div>
+  <!-- HERO CONTENT -->
+  <div class="flex-grow-1 d-flex flex-column justify-content-center align-items-center text-center px-3">
 
-          <!-- MetaMask Not Installed -->
-          <div *ngIf="!isMetaMaskInstalled" class="text-center">
-            <div class="mb-4">
-              <!-- MetaMask Fox SVG -->
-              <svg width="80" height="80" viewBox="0 0 318.6 318.6" xmlns="http://www.w3.org/2000/svg">
-                <path fill="#E2761B" stroke="#E2761B" stroke-linecap="round" stroke-linejoin="round" d="m274.1 35.5-99.5 73.9L193 65.8z"/>
-                <path fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round" d="m44.4 35.5 98.7 74.6-17.5-44.3zm193.9 171.3-26.5 40.6 56.7 15.6 16.3-55.3zm-204.4.9L50.1 263l56.7-15.6-26.5-40.6z"/>
-                <path fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round" d="m103.6 138.2-15.8 23.9 56.3 2.5-2-60.5zm111.3 0-39-34.8-1.3 61.2 56.2-2.5zM106.8 247.4l33.8-16.5-29.2-22.8zm71.1-16.5 33.9 16.5-4.7-39.3z"/>
-                <path fill="#D7C1B3" stroke="#D7C1B3" stroke-linecap="round" stroke-linejoin="round" d="m211.8 247.4-33.9-16.5 2.7 22.1-.3 9.3zm-105 0 31.5 14.9-.2-9.3 2.5-22.1z"/>
-                <path fill="#233447" stroke="#233447" stroke-linecap="round" stroke-linejoin="round" d="m138.8 193.5-28.2-8.3 19.9-9.1zm40.9 0 8.3-17.4 20 9.1z"/>
-                <path fill="#CD6116" stroke="#CD6116" stroke-linecap="round" stroke-linejoin="round" d="m106.8 247.4 4.8-40.6-31.3.9zm100.2-40.6 4.8 40.6 26.5-39.7zm23.8-44.7-56.2 2.5 5.2 28.9 8.3-17.4 20 9.1zm-120.2 23.1 20-9.1 8.2 17.4 5.3-28.9-56.3-2.5z"/>
-                <path fill="#E4751F" stroke="#E4751F" stroke-linecap="round" stroke-linejoin="round" d="m87.8 162.1 23.6 46-.8-22.9zm120.3 23.1-.7 22.9 23.5-46zm-64-20.6-5.3 28.9 6.6 34.1 1.5-44.9zm30.5 0-2.7 18 1.2 45 6.7-34.1z"/>
-                <path fill="#F6851B" stroke="#F6851B" stroke-linecap="round" stroke-linejoin="round" d="m179.8 193.5-6.7 34.1 4.8 3.3 29.2-22.8.7-22.9zm-69.2-8.3.8 22.9 29.2 22.8 4.8-3.3-6.6-34.1z"/>
-                <path fill="#C0AD9E" stroke="#C0AD9E" stroke-linecap="round" stroke-linejoin="round" d="m180.3 262.3.3-9.3-2.5-2.2h-37.7l-2.3 2.2.2 9.3-31.5-14.9 11 9 22.3 15.5h38.3l22.4-15.5 11-9z"/>
-                <path fill="#161616" stroke="#161616" stroke-linecap="round" stroke-linejoin="round" d="m177.9 230.9-4.8-3.3h-27.7l-4.8 3.3-2.5 22.1 2.3-2.2h37.7l2.5 2.2z"/>
-                <path fill="#763D16" stroke="#763D16" stroke-linecap="round" stroke-linejoin="round" d="m278.3 114.2 8.5-40.8-12.7-37.9-96.2 71.4 37 31.3 52.3 15.3 11.6-13.5-5-3.6 8-7.3-6.2-4.8 8-6.1zM31.8 73.4l8.5 40.8-5.4 4 8 6.1-6.1 4.8 8 7.3-5 3.6 11.5 13.5 52.3-15.3 37-31.3-96.2-71.4z"/>
-                <path fill="#F6851B" stroke="#F6851B" stroke-linecap="round" stroke-linejoin="round" d="m267.2 153.5-52.3-15.3 15.9 23.9-23.7 46 31.2-.4h46.5zm-163.6-15.3-52.3 15.3-17.4 54.2h46.4l31.1.4-23.6-46zm71 26.4 3.3-57.7 15.2-41.1h-67.5l15 41.1 3.5 57.7 1.2 18.2.1 44.8h27.7l.2-44.8z"/>
-              </svg>
-            </div>
-            <h5 class="mb-3">MetaMask Required</h5>
-            <p class="text-muted mb-4">
-              Please install MetaMask to use this decentralized application.
-            </p>
-            <a href="https://metamask.io/download/"
-               target="_blank"
-               class="btn btn-warning btn-lg w-100">
-              Install MetaMask
-            </a>
-          </div>
+    <span class="badge rounded-pill bg-black border border-warning text-warning mb-3">
+      ● LIVE ON BSC MAINNET
+    </span>
 
-          <!-- Connect Wallet Button -->
-          <div *ngIf="isMetaMaskInstalled && !walletState?.isConnected" class="text-center">
-            <div class="mb-4">
-              <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-wallet2 text-primary" viewBox="0 0 16 16">
-                  <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499L12.136.326zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484L5.562 3zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/>
-                </svg>
-              </div>
-            </div>
-            <h5 class="mb-3">Connect Your Wallet</h5>
-            <p class="text-muted mb-4">
-              Connect your MetaMask, Trust Wallet, or SafePal to get started.
-              <br>
-              <small>No email or password required.</small>
-            </p>
-            <button class="btn btn-primary btn-lg w-100"
-                    (click)="connectWallet()"
-                    [disabled]="connecting">
-              <span *ngIf="connecting" class="spinner-border spinner-border-sm me-2"></span>
-              {{ connecting ? 'Connecting...' : 'Connect Wallet' }}
-            </button>
+    <h1 class="display-4 fw-bold">
+      <span class="text-warning">REAL CASH</span><br>
+      GAME ECOSYSTEM
+    </h1>
 
-            <div class="mt-4">
-              <small class="text-muted">
-                Supported wallets: MetaMask, Trust Wallet, SafePal
-              </small>
-            </div>
-          </div>
+    <p class="text-secondary mt-3 mb-4">
+      Real Cash Gaming on BSC. 8X Wins. 100% Cashback Protection. Multi-Level Rewards.
+      Join the revolution.
+    </p>
 
-          <!-- Wallet Connected - Not Registered -->
-          <div *ngIf="walletState?.isConnected && !userInfo?.isRegistered" class="text-center">
-            <div class="mb-4">
-              <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-check-circle text-success" viewBox="0 0 16 16">
-                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                  <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-                </svg>
-              </div>
-            </div>
+    <button class="btn btn-warning btn-lg px-5"
+            (click)="openWalletModal()">
+      🔗 Connect Wallet to Start
+    </button>
 
-            <h5 class="mb-2">Wallet Connected!</h5>
-            <p class="text-muted small mb-3">
-              {{ walletState?.address | slice:0:6 }}...{{ walletState?.address | slice:-4 }}
-            </p>
+    <small class="text-secondary mt-2">
+      Connect your wallet to access Dashboard, Game & Rewards
+    </small>
 
-            <div class="card bg-light mb-4">
-              <div class="card-body">
-                <div class="row text-center">
-                  <div class="col-6 border-end">
-                    <small class="text-muted d-block">BNB Balance</small>
-                    <strong>{{ walletState?.balance | number:'1.4-4' }}</strong>
-                  </div>
-                  <div class="col-6">
-                    <small class="text-muted d-block">USDT Balance</small>
-                    <strong>{{ walletState?.usdtBalance | number:'1.2-2' }}</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
+  </div>
 
-            <div *ngIf="referrerAddress" class="alert alert-info small mb-3">
-              <strong>Referrer:</strong> {{ referrerAddress | slice:0:10 }}...
-            </div>
+</div>
 
-            <div class="d-grid gap-2">
-              <button class="btn btn-success btn-lg"
-                      (click)="register()"
-                      [disabled]="registering || loading">
-                <span *ngIf="registering" class="spinner-border spinner-border-sm me-2"></span>
-                {{ registering ? 'Registering...' : 'Join TRK Ecosystem' }}
-              </button>
-            </div>
 
-            <div class="mt-4">
-              <div class="alert alert-success small mb-0">
-                <strong>Free Bonus:</strong> Get 100 USDT Practice Balance instantly!
-              </div>
-            </div>
-          </div>
+<!-- ================= FEATURES ================= -->
 
-          <!-- Loading -->
-          <div *ngIf="loading" class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2 text-muted">Checking registration status...</p>
-          </div>
-        </div>
-      </div>
+<div class="container py-5 text-white">
 
-      <!-- Footer Info -->
-      <div class="text-center mt-4 text-muted small">
-        <p class="mb-2">
-          Built on <strong>Binance Smart Chain (BEP-20)</strong>
-        </p>
-        <p class="mb-0">
-          100% Decentralized | Smart Contract Powered | Self-Custody
+  <div class="row g-4 text-center">
+
+    <div class="col-md-3">
+      <div class="card bg-dark border-0 p-4 h-100">
+        🎁
+        <h5>$100 Bonus</h5>
+        <p class="text-secondary">
+          Frozen bonus on signup. Unlock with first deposit.
         </p>
       </div>
     </div>
+
+    <div class="col-md-3">
+      <div class="card bg-dark border-0 p-4 h-100">
+        🎲
+        <h5>8X Wins</h5>
+        <p class="text-secondary">
+          2X instant payout + 6X replay balance.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card bg-dark border-0 p-4 h-100">
+        🛡
+        <h5>Cashback</h5>
+        <p class="text-secondary">
+          100% loss protection with daily ROI system.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card bg-dark border-0 p-4 h-100">
+        💰
+        <h5>15 Levels</h5>
+        <p class="text-secondary">
+          Multi-tier referral income structure.
+        </p>
+      </div>
+    </div>
+
   </div>
+
+</div>
+
+
+<!-- ================= HOW IT WORKS ================= -->
+
+<div class="container py-5 text-center text-white">
+
+  <h2 class="mb-5">How It Works</h2>
+
+  <div class="row g-4">
+
+    <div class="col-md-4">
+      <div class="border rounded-circle d-inline-flex
+                  align-items-center justify-content-center
+                  border-warning text-warning
+                  mb-3" style="width:60px;height:60px;">
+        1
+      </div>
+      <h5>Connect Wallet</h5>
+      <p class="text-secondary">
+        Connect your MetaMask or any Web3 wallet to BSC Mainnet
+      </p>
+    </div>
+
+    <div class="col-md-4">
+      <div class="border rounded-circle d-inline-flex
+                  align-items-center justify-content-center
+                  border-warning text-warning
+                  mb-3" style="width:60px;height:60px;">
+        2
+      </div>
+      <h5>Register & Deposit</h5>
+      <p class="text-secondary">
+        Sign up with referral code and deposit 10 USDT to activate
+      </p>
+    </div>
+
+    <div class="col-md-4">
+      <div class="border rounded-circle d-inline-flex
+                  align-items-center justify-content-center
+                  border-warning text-warning
+                  mb-3" style="width:60px;height:60px;">
+        3
+      </div>
+      <h5>Play & Earn</h5>
+      <p class="text-secondary">
+        Win 8X on lucky numbers. Get cashback. Earn from referrals.
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ================= WALLET MODAL ================= -->
+
+<div class="wallet-backdrop" *ngIf="showWalletModal">
+
+  <div class="wallet-modal">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5>Connect a Wallet</h5>
+      <button class="btn-close btn-close-white"
+              (click)="closeWalletModal()"></button>
+    </div>
+
+    <div class="row">
+
+      <!-- LEFT -->
+      <div class="col-5 border-end">
+
+        <!-- MetaMask -->
+<div class="wallet-item"
+     *ngIf="isMetaMaskInstalled"
+     (click)="connectWallet()">
+  🦊 MetaMask
+  <div style="font-size:12px;color:#22c55e">Installed</div>
+</div>
+
+<div class="wallet-item"
+     *ngIf="!isMetaMaskInstalled"
+     (click)="openInstall('https://metamask.io/download/')">
+  🦊 MetaMask
+</div>
+
+
+<div class="wallet-item"
+     (click)="openInstall('https://chrome.google.com/webstore/detail/ready-wallet')">
+  🔶 Ready
+</div>
+
+<div class="wallet-item"
+     (click)="openInstall('https://trustwallet.com/browser-extension')">
+  🔷 Trust Wallet
+</div>
+
+<div class="wallet-item"
+     (click)="openInstall('https://chrome.google.com/webstore/detail/coinbase-wallet-extension')">
+  🟦 Coinbase Wallet
+</div>
+
+<div class="wallet-item"
+     (click)="openInstall('https://www.ledger.com/ledger-live')">
+  🔒 Ledger
+</div>
+
+      </div>
+
+      <!-- RIGHT -->
+      <div class="col-7 ps-4">
+
+        <h6>What is a Wallet?</h6>
+
+        <p class="text-secondary">
+          A home for your digital assets. Send, receive, store and display
+          crypto & NFTs.
+        </p>
+
+        <p class="text-secondary">
+          A new way to log in without passwords.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>

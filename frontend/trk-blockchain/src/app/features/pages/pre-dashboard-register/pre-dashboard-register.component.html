@@ -1,0 +1,43 @@
+<div class="register-wrapper">
+
+  <div class="register-card">
+
+    <h2>Join TRK Game</h2>
+
+    <p class="subtitle">
+      Register to unlock your referral code and rewards.
+    </p>
+
+    <div class="status-pill">
+      ● Wallet Connected
+    </div>
+
+    <label>Referral Address (Required)</label>
+
+   <input
+  type="text"
+  placeholder="Enter Referral Code (TRK... or 0x...)"
+  [(ngModel)]="referralCode"
+  (input)="onReferralChange()"
+/>
+
+<div style="color:#22c55e;font-size:13px;margin-top:6px"
+     *ngIf="detectedReferrer">
+  Referrer: {{ detectedReferrer }}
+</div>
+
+    <div class="error" *ngIf="error">
+      {{ error }}
+    </div>
+
+    <button (click)="register()" [disabled]="loading">
+      Register & Claim 100 USDT Bonus
+    </button>
+
+    <div class="bonus-text">
+      🎁 You get: 100 USDT Bonus (Practice Account)
+    </div>
+
+  </div>
+
+</div>

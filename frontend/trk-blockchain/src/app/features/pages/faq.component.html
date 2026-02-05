@@ -1,0 +1,119 @@
+<!-- <app-navbar-inner></app-navbar-inner> -->
+
+<div class="page-container">
+
+<h2 class="page-title">Frequently Asked Questions</h2>
+
+<!-- FAQ 1 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(0)">What is TRK Game?</div>
+  <div class="faq-body" *ngIf="open===0">
+    TRK Game is a blockchain-based prediction game platform on BSC Mainnet with a 15-level referral system. Players can earn through winnings and referral commissions.
+  </div>
+</div>
+
+<!-- FAQ 2 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(1)">How to start?</div>
+  <div class="faq-body" *ngIf="open===1">
+    Connect your wallet (MetaMask/Trust Wallet) to BSC Mainnet, register with a TRK referral code, and receive your $100 practice bonus plus your own unique TRK code.
+  </div>
+</div>
+
+<!-- FAQ 3 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(2)">What is a TRK Code?</div>
+  <div class="faq-body" *ngIf="open===2">
+    A TRK code is your unique referral identifier (e.g., TRK12345). It's easier to share than a wallet address and tracks your referral network automatically.
+  </div>
+</div>
+
+<!-- FAQ 4 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(3)">How much does it cost to play?</div>
+  <div class="faq-body" *ngIf="open===3">
+    Registration is FREE with $100 practice bonus. To play cash games, deposit minimum $10 USDT. Practice games are always free (24 per day).
+  </div>
+</div>
+
+<!-- FAQ 5 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(4)">How do I win?</div>
+  <div class="faq-body" *ngIf="open===4">
+    Predict a number (0-9). If it matches the winning number, you win 2X your bet as cashout plus 6X reinvested into your gaming balance.
+  </div>
+</div>
+
+<!-- FAQ 6 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(5)">How does the referral system work?</div>
+  <div class="faq-body" *ngIf="open===5">
+    Share your TRK code. When someone registers with it, they become your Level 1 referral. Their referrals are Level 2, and so on up to 15 levels. You earn commissions from all levels.
+  </div>
+</div>
+
+<!-- FAQ 7 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(6)">What are the referral percentages?</div>
+  <div class="faq-body" *ngIf="open===6">
+    Level 1: 5%, Level 2: 2%, Levels 3-5: 1% each, Levels 6-15: 0.5% each. Total: 15% distributed across your network.
+  </div>
+</div>
+
+<!-- FAQ 8 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(7)">How do withdrawals work?</div>
+  <div class="faq-body" *ngIf="open===7">
+    Minimum: 5 USDT, Maximum: 5000 USDT/day. Withdrawals are instant via smart contract. For referral income, you need 100 USDT cumulative before first withdrawal.
+  </div>
+</div>
+
+<!-- FAQ 9 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(8)">Is my money safe?</div>
+  <div class="faq-body" *ngIf="open===8">
+    Yes! All funds are managed by audited smart contracts on BSC. The platform is non-custodial - you control your wallet and funds at all times.
+  </div>
+</div>
+
+<!-- FAQ 10 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(9)">How many games can I play per day?</div>
+  <div class="faq-body" *ngIf="open===9">
+    24 practice games + 24 cash games per day. Practice games use your practice balance, cash games use real USDT.
+  </div>
+</div>
+
+<!-- FAQ 11 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(10)">What wallets are supported?</div>
+  <div class="faq-body" *ngIf="open===10">
+    MetaMask, Trust Wallet, and any WalletConnect-compatible wallet. Make sure you're connected to BSC Testnet (Chain ID: 97).
+  </div>
+</div>
+
+<!-- FAQ 12 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(11)">What happens if I lose?</div>
+  <div class="faq-body" *ngIf="open===11">
+    Lost bets are distributed: 2% Creator, 5% BD wallets, 5% FEW wallet, 15% referral network, 65% game pool for future winners.
+  </div>
+</div>
+
+<!-- FAQ 13 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(12)">Can I play on mobile?</div>
+  <div class="faq-body" *ngIf="open===12">
+    Yes! Use Trust Wallet or MetaMask mobile app. Connect to BSC Mainnet and access the platform through the in-app browser.
+  </div>
+</div>
+
+<!-- FAQ 14 -->
+<div class="glass-card">
+  <div class="faq-item" (click)="toggle(13)">What is the practice game?</div>
+  <div class="faq-body" *ngIf="open===13">
+    A risk-free game with an account with $100 bonus to learn the game. Practice winnings go to practice balance. Referral rewards from practice games are real USDT!
+  </div>
+</div>
+
+</div>
